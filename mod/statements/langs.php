@@ -1,0 +1,178 @@
+<?php 
+$lang_ant_1 = array ( "64" => array( 
+	"name" => "C++", 
+	"ext" => "cpp", 
+	"geshi" => "cpp",
+	"unpriv" => true,
+    ),
+    "65" => array( 
+	"name" => "Free Pascal", 
+	"ext" => "pas", 
+	"geshi" => "pascal",
+	"unpriv" => true,
+    ),
+    "66" => array( 
+	"name" => "Python", 
+	"ext" => "py", 
+	"geshi" => "python",
+	"unpriv" => true,
+    )
+);
+
+$lang_ant_2 = array ( "67" => array( 
+	"name" => "Runs to run", 
+	"ext" => "", 
+	"geshi" => "",
+	"unpriv" => true,
+    )
+);
+
+$lang_array = array( "1" => array( 
+	"name" => "Free Pascal 3.0", 
+	"ext" => "pas", 
+	"geshi" => "pascal",
+    "unpriv" => true,
+    "priv" => true,
+    ),
+    "2" => array( 
+	"name" => "GNU C 11.2", 
+	"ext" => "c", 
+	"geshi" => "cpp",
+	"unpriv" => true,
+	"priv" => true,
+    ),	
+    "3" => array( 
+	"name" => "GNU C++ 11.2", 
+	"ext" => "cpp", 
+	"geshi" => "cpp",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "7" => array( 
+	"name" => "Turbo Pascal", 
+	"ext" => "", 
+	"geshi" => "pascal",
+	"unpriv" => false,
+	"priv" => false,
+    ),    
+    "8" => array( 
+	"name" => "Borland Delphi 6 - 14.5", 
+	"ext" => "dpr", 
+	"geshi" => "pascal",
+	"unpriv" => false,
+	"priv" => false,
+    ),
+    "9" => array( 
+	"name" => "Borland C", 
+	"ext" => "", 
+	"geshi" => "c",
+	"unpriv" => false,
+	"priv" => false,
+    ),  
+    "10" => array( 
+	"name" => "Borland C++", 
+	"ext" => "", 
+	"geshi" => "cpp",
+	"unpriv" => false,
+	"priv" => false,
+    ),      
+    "18" => array( 
+	"name" => "Java JDK 15", 
+	"ext" => "java", 
+	"geshi" => "java5",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "22" => array( 
+	"name" => "PHP 7.2", 
+	"ext" => "php", 
+	"geshi" => "php",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "23" => array( 
+	"name" => "Python 2.7", 
+	"ext" => "", 
+	"geshi" => "python",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "24" => array( 
+	"name" => "Perl 5.28", 
+	"ext" => "pl", 
+	"geshi" => "perl",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "25" => array( 
+	"name" => "Mono C# 6.12", 
+	"ext" => "cs", 
+	"geshi" => "csharp",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "26" => array( 
+	"name" => "Ruby 2.5.3", 
+	"ext" => "rb", 
+	"geshi" => "ruby",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "27" => array( 
+	"name" => "Python 3.9", 
+	"ext" => "py", 
+	"geshi" => "python",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "28" => array( 
+	"name" => "Haskell GHC 8.2.2", 
+	"ext" => "hs", 
+	"geshi" => "haskell",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "29" => array( 
+	"name" => "FreeBASIC 1.05.0", 
+	"ext" => "bas", 
+	"geshi" => "basic",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "30" => array( 
+	"name" => "PascalABC 3.7", 
+	"ext" => "", 
+	"geshi" => "pascal",
+	"unpriv" => true,
+	"priv" => true,
+    ),  
+    "68" => array( 
+	"name" => "GNU C++ 5.3.1 + sanitizer", 
+	"ext" => "", 
+	"geshi" => "cpp",
+	"unpriv" => false,
+	"priv" => false,
+    ),
+    "71" => array( 	
+	"name" => "Kotlin 1.4", 
+	"ext" => "kt", 
+	"geshi" => "kt",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "89" => array( 	
+	"name" => "Scala 2.13", 
+	"ext" => "scala", 
+	"geshi" => "scala",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+    "53" => array( 	
+	"name" => "GNU Go 11.2", 
+	"ext" => "go", 
+	"geshi" => "go",
+	"unpriv" => true,
+	"priv" => true,
+    ),
+);
+?>

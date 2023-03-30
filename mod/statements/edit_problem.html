@@ -1,0 +1,141 @@
+<form name="chaptereditform" method="post" action="edit_vg.php">
+<!--input type="hidden" name="analysis" value="2"-->
+<table align="center" cellpadding="5">
+
+<tr valign="top">
+    <td align="right">
+        <b><nobr><?php print_string("chaptertitle", "statements") ?>:</nobr></b>
+    </td>
+    <td align="left">
+<?php if(isadmin()) { ?>
+        <input type="text" name="name" size="60" value="<?php p($chapter->name) ?>">
+<?php
+} else {
+  echo(p($chapter->name));	
+}
+?>
+    </td>
+</tr>
+
+<?php if(isadmin()) { ?>
+<tr valign="top">
+    <td width="20%" valign="middle" align="right">
+        <p><b><?php print_string('subjects', 'statements') ?>:</b></p>
+    </td>
+    <td valign="middle" align="left">
+       <?php 
+	$i=1;
+	foreach ($subjects as $subj) {
+//	  echo "        <input type='text' name='subject[".($i++)."]' size='6' value='".$subj->subject_id."'> $subj->name<br>";
+	  print_subject_select($subj->subject_id);
+	  $i++;
+	}
+
+	for($j=$i;$j<=4;$j++){;	
+	  print_subject_select(0);
+	}
+       ?>
+    </td>
+</tr>
+<?php } else { if($_GET["subject"]==1) { ?>
+
+
+<tr valign="top">
+    <td width="20%" valign="middle" align="right">
+        <p><b><?php print_string('subjects', 'statements') ?>:</b></p>
+    </td>
+    <td valign="middle" align="left">
+      <?php
+	$select = mysql_query("SELECT s.subject_id,name from ps_problem_subjects as p, ps_subjects as s WHERE leaf=1 AND p.problem_id=$chapter->id AND p.subject_id=s.subject_id ORDER BY p.order_value");
+    while($sub = mysql_fetch_array($select)){
+     echo "<input type='text' value='".$sub['name']."' readonly>&nbsp;";
+     } 
+	 ?>	  
+	  <br>
+	  <?php 
+	   
+	$i=1;
+	foreach ($subjects as $subj) {
+//	  echo "        <input type='text' name='subject[".($i++)."]' size='6' value='".$subj->subject_id."'> $subj->name<br>";
+//	  print_subject_select($subj->subject_id);
+	  $i++;
+	}
+
+	for($j=$i;$j<=4;$j++){
+	  print_subject_select(0);
+	}
+       ?>	
+    </td>
+</tr>
+
+
+<?php } } ?>
+
+
+
+<tr valign="top">
+    <td valign="top" align="right">
+        <p><b><?php print_string('content', 'statements') ?>:</b></p>
+    </td>
+
+    <td align="left">
+<?php 		if(isadmin()) {
+			print_textarea($usehtmleditor, 20, 100,630, 400, 'content', $chapter->content, $course->id); 
+		} else {
+			echo $chapter->content;
+		}
+?>
+    </td>
+</tr>
+<?php if(isadmin()) { ?>
+<tr>
+    <td valign="top" align="right">
+        <p><b><?php print_string('description', 'statements')?>:</b></p>
+    </td>
+    <td align="left">
+        <?php print_textarea(0, 20, 100, 630, 400, 'description', $chapter->description, $course->id); ?>
+    </td>
+</tr>
+<?php } 
+
+if($_GET["analysis"]==1 || isadmin()) {
+?>
+<tr valign="top">
+    <td valign="top" align="right">
+        <p><b><?php print_string('analysis', 'statements') ?>:</b><br>Используйте код программы только в тех случаях, 
+	когда хотите продемонстрировать особенности языка программирования или какие-то типичные конструкции. Чем короче этот код, и чем меньше его в разборе - тем лучше!</p>
+	<p>Обратите внимание на поле Формат! HTML-формат подразумевает, что вы пишете текст на языке html (обратите внимание на
+        символы меньше-больше и разбиение на строки-абзацы!) Текстовый формат подразумевает,
+	что вы должны вручную вводить символы перевода строк. </p>     
+</td>
+    <td align="left">
+        <?php print_textarea(0, 20, 100, 630, 400, 'analysis', $chapter->analysis, $course->id); ?><br>
+		<b>Формат:</b>&nbsp;<select name="format">
+	<option value="1">HTML формат</option>
+	<option value="2">Текстовый формат</option>
+	</select>
+    </td>
+</tr>
+<?php } ?>
+</table>
+<center>
+    <input type="submit" value="<?php print_string('savechanges') ?>" />
+    <input type="reset" value="<?php print_string('revert') ?>" />
+    <?php
+        if($chapter->id == -1) {
+            echo '<font size="-1"> (<a href="import.php?id='.$cm->id.'">'.get_string('doimport', 'statements').'</a>)</font>';
+        }
+    ?>
+</center>
+    <input type="hidden" name="id"        value="<?php p($cm->id) ?>" />
+    <input type="hidden" name="rank"   value="<?php p($chapter->rank) ?>" />
+    <input type="hidden" name="chapterid" value="<?php p($chapter->id) ?>" />
+    <input type="hidden" name="sesskey" value="<?php echo $USER->sesskey ?>" /> 
+</form>
+<?php 
+$allowedit = has_capability('moodle/course:manageactivities', $context);
+if ($allowedit) {
+  include('pics.php');
+  pics_loader($chapter->id, 0);
+}
+?>

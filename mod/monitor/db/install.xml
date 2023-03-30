@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/statements/db" VERSION="20070406" COMMENT="XMLDB file for Moodle mod/statements"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="monitor" COMMENT="Defines monitors">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" COMMENT="id of the table, please edit me" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="course" NEXT="summary"/>
+        <FIELD NAME="summary" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="name" NEXT="monitor_id"/>
+        <FIELD NAME="monitor_id" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="summary" NEXT="group_id"/>
+		<FIELD NAME="group_id" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="monitor_id" NEXT="disableprinting"/>
+        <FIELD NAME="disableprinting" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="2" SEQUENCE="false" ENUM="false" PREVIOUS="group_id" NEXT="customtitles"/>
+        <FIELD NAME="customtitles" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="disableprinting" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="customtitles" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" PREVIOUS="timecreated"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for monitor"/>
+      </KEYS>
+    </TABLE>
+   </TABLES>
+  <MONITORS>
+    <MONITOR NAME="insert log_display" TYPE="insert" TABLE="log_display" COMMENT="Initial insert of records on table log_display">
+      <SENTENCES>
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('monitor', 'update',   'monitor', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('monitor', 'view',     'monitor', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('monitor', 'view all', 'monitor', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('monitor', 'print',    'monitor', 'name')" />
+      </SENTENCES>
+    </MONITOR>
+  </MONITORS>
+
+</XMLDB>

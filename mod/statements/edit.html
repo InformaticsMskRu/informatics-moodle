@@ -1,0 +1,65 @@
+<form name="chaptereditform" method="post" action="edit.php">
+<table align="center" cellpadding="5">
+
+<tr valign="top">
+    <td align="right">
+        <b><nobr><?php print_string("chaptertitle", "statements") ?>:</nobr></b>
+    </td>
+    <td align="left">
+        <input type="text" name="name" size="60" value="<?php p($chapter->name) ?>">
+    </td>
+</tr>
+
+<tr valign="top">
+    <td valign="top" align="right">
+        <p><b><?php print_string('content', 'statements') ?>:</b></p>
+    </td>
+
+    <td align="left">
+        <?php print_textarea($usehtmleditor, 20, 100,630, 400, 'content', $chapter->content, $course->id); ?>
+    </td>
+</tr>
+<tr>
+    <td valign="top" align="right">
+        <p><b><?php print_string('description', 'statements') ?>:</b></p>
+    </td>
+    <td align="left">
+        <?php print_textarea(0, 20, 100, 630, 400, 'description', $chapter->description, $course->id); ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td valign="top" align="right">
+        <p><b><?php print_string('analysis', 'statements') ?>:</b></p>
+    </td>
+    <td align="left">
+        <?php print_textarea(0, 20, 100, 630, 400, 'analysis', $chapter->analysis, $course->id); ?>
+    </td>
+</tr>
+</table>
+<center>
+<!--EXPERIMENTAL FEATURE: <a href="http://informatics.mccme.ru/inf/contest.php?contest=
+<?php
+echo $_GET['statement_id']
+?>">Choose problems from rubricator</a>--> 
+    <input type="submit" value="<?php print_string('savechanges') ?>" />
+    <input type="reset" value="<?php print_string('revert') ?>" />
+    <?php
+        if($chapter->id == -1) {
+            echo '<font size="-1"> (<a href="import.php?id='.$cm->id.'">'.get_string('doimport', 'statements').'</a>)</font>';
+        }
+    ?>
+</center>
+    <input type="hidden" name="cmid"        value="<?php p($cm->id) ?>" />
+    <input type="hidden" name="id"        value="<?php p($cm->id) ?>" />
+    <input type="hidden" name="rank"   value="<?php p($chapter->rank) ?>" />
+    <input type="hidden" name="chapterid" value="<?php p($chapter->id) ?>" />
+    <input type="hidden" name="sesskey" value="<?php echo $USER->sesskey ?>" /> 
+</form>
+<?php
+$allowedit = has_capability('moodle/course:manageactivities', $context);
+if ($allowedit) {
+  include('pics.php');
+  pics_loader($chapter->id, $cm->id);
+}
+?>
+

@@ -1,0 +1,7 @@
+    line-height: 1.412rem;
+
+.line-numbers-rows>span {
+    display: block;
+    counter-increment: linenumber;
+    line-height: 1.412rem;
+}
