@@ -8,17 +8,19 @@ class local_pynformatics_external extends external_api {
 			array(
 				'moodlesid' => new external_value(PARAM_TEXT, 'MoodleSid from cookies', VALUE_DEFAULT, ''),
 				'capability' => new external_value(PARAM_TEXT, 'String capability', VALUE_DEFAULT, ''),
+				'courseid' => new external_value(PARAM_INT, 'int course id', VALUE_DEFAULT, 0)
 			)
 		);
 	}
 
-	public static function has_capability($moodlesid = '', $capability = '') {
+	public static function has_capability($moodlesid = '', $capability = '', $courseid = 0) {
 		global $USER;
 		
 		$params = self::validate_parameters(self::has_capability_parameters(),
 			array(
 				'moodlesid' => $moodlesid,
-				'capability' => $capability
+				'capability' => $capability,
+                                'courseid' => $courseid,
 			)
 		);
 
@@ -28,7 +30,9 @@ class local_pynformatics_external extends external_api {
 		$session_info = \core\session\manager::time_remaining($params['moodlesid']);
 		$userid = $session_info['userid'];
 		if (!has_capability('local/pynformatics:check_capability', $context)) {
-
+                        if ($courseid > 0) { 
+                             $context = context_course::instance($courseid);
+                        }
 			$flag = $params['capability'] && has_capability($params['capability'], $context, $userid);
 			return array('user_id' => $userid, 'capability'=> array('name'=>$params['capability'],'status'=>$flag));
 		} else {

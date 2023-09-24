@@ -33,4 +33,5 @@ function lang_time_block($problem_id) {
     }
 }
  
+#echo lang_time_block(1291);
 ?>

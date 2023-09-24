@@ -454,7 +454,10 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                     with_comment: withComment,
                     page: page_index,
                 };
-
+		var courseId =    jQuery('#course_id').html();
+                if (courseId != "") {
+                    params["course_id"] = courseId;
+                }
                 if (groupId != "") {
                     params["group_id"] = groupId;
                 }
@@ -541,6 +544,10 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                 if (groupId != "") {
                     params["group_id"] = groupId;
                 }
+ 		var courseId =    jQuery('#course_id').html();
+                if (courseId != "") {
+                    params["course_id"] = courseId;
+                }
  
                 // console.log(run_id);
                 // console.log(window.CACHED_RUNS);
@@ -582,6 +589,7 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
             }
 	        function loadSourceWindow(run_id){
                 var master_sid = jQuery('#run_master_sid').html();
+                var course_teacher = jQuery('#course_teacher').html();
                 var wnd = jQuery("#protocolRow" + run_id);
                 wnd.toggle();
                 var content = `
@@ -667,7 +675,14 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                     contentType: "application/json; charset=utf-8",
                     success: showCommentEvent(run_id)
                 });
+                var data = {};
+                var course_id = jQuery('#course_id').html();
+                if (course_id) {
+                    data["course_id"] = course_id;
+                }
                 jQuery.ajax({
+                    type: "POST",
+                    data: data,
                     url: "/py/problem/run/" + run_id + "/source",
                     context: document.body,
                     success: function(data){
@@ -693,9 +708,16 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                         }
                         jQuery("#sourceTab" + run_id).html('<pre class="language-' + prism_attr + ' line-numbers" data-download-link><code>' + html + lineNumbersWrapper +'</code></pre>');
                     }
-                });      
+                });     
+                var course_id = jQuery('#course_id').html(); 
+                var data = {};
+                if (course_id) {
+                    data["course_id"] = course_id;
+                }
                 jQuery.ajax({
+                    type: "POST",
                     url: "/py/protocol/get/" + run_id,
+                    data: data,
                     context: document.body,
                     success: function(data){
                         res = jQuery("#protocol-tmpl").tmpl(data, {"stat": getSubmitStatistic(data), "prot": "user"});
@@ -859,13 +881,14 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                     520: 'Submit error',
                 };
                 var master_sid = jQuery('#run_master_sid').html();
+                var course_teacher = jQuery('#course_teacher').html();
                 var current_user_id = jQuery('#current_user_id').html();
                 runs.forEach((run) => {
                     run.str_status = statuses_map[run.ejudge_status];
                     run.rejudge_sid = true;
                     run.master_sid = master_sid;
                     run.sb_uid = 'gfhgjghjgh'; // Это уникальный юид, переделать потом
-                    run.sid = master_sid || run.user.id == current_user_id;
+                    run.sid = master_sid || run.user.id == current_user_id || (course_teacher && run.current);
                 });
             }
             
@@ -1050,12 +1073,17 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
     jQuery('#submit_button').bind("click", function() { test.submit(); return false; });  
 	var problemId = jQuery('#problem_id').html();
         if (jQuery('#submit_button').length) {
+                data = {
+                    lang_id: 3
+                }
+                var course_id = jQuery('#course_id').html();
+                if (course_id) {
+                    data["course_id"] = course_id;
+                }
 		var test = new AjaxUpload(jQuery('#upload_button'), {
 			'action': '/py/problem/'+ problemId +'/submit',
 		        name: 'file',
-		        data: {
-        		   lang_id : 3
-        		},
+		        data: data,
 		        autoSubmit: false,
 		        responseType: "json",
 		        onChange: function(file, extension) {

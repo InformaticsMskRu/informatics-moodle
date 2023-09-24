@@ -24,6 +24,22 @@ $capabilities = array(
 			'ejudge_teacher' => CAP_ALLOW,
 		)
 	),
+ 	'mod/statement:view_source' =>array(
+		'riskbitmask'  => RISK_PERSONAL | RISK_CONFIG,
+		'captype'	   => 'read',
+		'contextlevel' => CONTEXT_COURSE,
+		'archetypes'   => array(
+			'manager' => CAP_ALLOW,
+		)
+	),
+ 	'mod/statement:view_protocol' =>array(
+		'riskbitmask'  => RISK_PERSONAL | RISK_CONFIG,
+		'captype'	   => 'read',
+		'contextlevel' => CONTEXT_COURSE,
+		'archetypes'   => array(
+			'manager' => CAP_ALLOW,
+		)
+	),
 	'moodle/site:edit_problem' =>array(
 		'riskbitmask'  => RISK_SPAM | RISK_PERSONAL | RISK_XSS | RISK_CONFIG,
 		'captype'	   => 'write',

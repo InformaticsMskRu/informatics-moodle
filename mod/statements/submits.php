@@ -10,6 +10,7 @@ class Submits {
 
 	// Статус посылки
 	private $status_id = -1;
+        private $course_id = -1;
 
     private $from_timestamp = -1;
     private $to_timestamp = -1;
@@ -41,6 +42,11 @@ class Submits {
     function setFromTimestamp($timestamp)
     {
         $this->from_timestamp = (int)$timestamp;
+    }
+
+    function setCourseId($course_id)
+    {
+        $this->course_id = (int)$course_id;
     }
 
     function setToTimestamp($timestamp)
@@ -126,7 +132,11 @@ class Submits {
         if (has_capability('moodle/ejudge_submits:rejudge', context_system::instance())) {
              $run_master_sid = "YES";
         }
-       
+	$teacher_flag = '';
+
+        if ($this->course_id > 0) {
+	   $teacher_flag = has_capability('mod/statement:view_source', context_course::instance($this->course_id));
+        }
 	$current_page_id = "";
 	if (array_key_exists("id", $_GET)) {
 		$current_page_id = $_GET["id"];
@@ -378,6 +388,7 @@ class Submits {
         <div id="count" style="display: none">'.$this->base.'</div>
         <div id="opened_window" style="display: none"></div>	
         <div id="run_master_sid" style="display: none">'.$run_master_sid.'</div>
+        <div id="course_teacher" style="display: none">'.$teacher_flag.'</div>
         <div id="current_page_id" style="display: none">'. $current_page_id .'</div>
 		<div id="Searchresult">
 			<div class="spinner-border text-primary" role="status">

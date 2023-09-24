@@ -1,5 +1,7 @@
 <?PHP // $Id: view.php,v 1.2.8.2 2007/06/17 10:36:37 stronk7 Exp $
 
+// Версия для работы с отдельной базой задач.
+
 require_once('../../config.php');
 require_once('lib.php');
 require_once('lang.php');
@@ -100,6 +102,8 @@ if (!$without_course)
 
 if (!$chapters_new && !$without_course) {
     if ($allowedit) {
+		//VG
+		//redirect('edit3.php?id='.$cm->id); //no chapters - add new one
 		redirect('../../course/modedit.php?return=0&update='.$cm->id); //no chapters - add new one
     } else {
         if (!$without_course)
@@ -234,10 +238,13 @@ if (!$without_course)
            $iid = null;
         }
         $heading = format_text($OUTPUT->heading(get_string('problem', 'statements')." №".$chapter->id.". ".$chapter->name), FORMAT_HTML, array("noclean" => true), $iid);
+	//$PAGE->set_heading($heading); // Required
 	$PAGE->set_title($heading);
 	$PAGE->set_cacheable(false);
+	//require('toc.php');
         statement_add_limits($chapter);
 	statements_add_menu_block($chapter);
+	//statements_add_toc_block($chapters_new, $chapter, $statements, $cm, $edit);
     echo $OUTPUT->header();
     echo $heading;
 }
@@ -338,6 +345,7 @@ if(!$without_course && $statements->olympiad == 1) {
 		}
 	}
 } else if ($end_olymp) {
+    // Можем закончить виртуальный тур.
     $db->Execute('UPDATE mdl_virtualcontest SET duration = '.time().' - mdl_virtualcontest.start WHERE user_id ='.$USER->id.' AND statement_id = '.$statements->id);
     redirect('view.php?id='.$cm->id);
 }
@@ -361,6 +369,7 @@ if ($without_course || $statements->disableprinting) {
     $printchapter = '<a title="'.get_string('printchapter', 'statements').'" href="print3.php?id='.$cm->id.'&amp;chapterid='.$problem_id.'" onclick="this.target=\'_blank\'"><img src="pix/print_chapter.gif" class="bigicon" alt="'.get_string('printchapter', 'statements').'"/></a>';
 }
 
+// Получаем спискок групп, с которыми связан пользователь.
 $groups = $DB->get_records_sql("SELECT distinct mdl_ejudge_group.id, mdl_ejudge_group.name ".
 					 "FROM mdl_ejudge_group left join mdl_ejudge_group_users on  mdl_ejudge_group.id = mdl_ejudge_group_users.group_id ".
 					 "WHERE mdl_ejudge_group.visible=1 ".
@@ -444,11 +453,57 @@ if ($show_statements) {
 	if($show_statements) {
         $content = "";
         if (!$usertype || !isset($statements) || (!$statements->customtitles && $usertype->data!=="Команда") || isadmin()) {
-        
+          //      $content .= "<div>";
+//                if($chapter->analysis) {
+//                    $content .= " :: <a onClick='toggle_show(\"analysis\")'>Разбор</a>";
+//                } // else {
+					//if($USER->id != 1 && !isadmin()) {
+//!!!!!!!!!!!!!!!!!!!
+						//$content .= " :: <a href='edit_vg.php?chapterid=".$chapterid."&amp;analysis=1'>Написать разбор</a> ";
+					//}
+				//}
+//				if($USER->id != 1) {
+						//$content .= " :: <a href='edit_vg.php?chapterid=".$chapterid."&amp;subject=1'>Добавить темы</a> ";
+//						$content .= " :: <a href=\"#\" onClick='add_subjects_show(".$problem_id.")'>Добавить темы</a> ";
+//					}
+//				if($chapter->description) {
+//					$content .= " :: <a onClick='toggle_show(\"description\")'>Описание</a>";
+//				}
+//				if($subjects = $DB->get_records_sql('SELECT name, p.subject_id from ps_problem_subjects as p, ps_subjects as s WHERE leaf=1 AND p.problem_id='.$problem_id.' AND p.subject_id=s.subject_id ORDER BY p.order_value'))
+//				{
+					//$content .= " :: <a onClick='toggle_show(\"subjects\")'>Темы</a>";
+					
+//				}
+//				$content .= " :: <a href=\"#\" onClick='cur_subjects_show(".$problem_id.")'>Темы</a>";
+//				$content .= " :: <a href=\"#\" onClick='ideal_toggle();'>Лучшие решения</a>";
+	//			if(isadmin()) {
+        //  $content .= " :: <a href=\"#\" onClick='hint_toggle();'>Подсказки</a>";
+	//			}
+
                if(isadmin()) {
                     $content.= " :: <a href=\"#\" id=\"invert_limits\">Показать/спрятать лимиты</a>";
            	
                 }
+	//	if (isadmin()) {
+	//		$content.= " :: <a href=\"#\" onClick='add_sources_show(".$problem_id.")' id=\"show_sources\">Редактировать источники</a>";
+	//	}
+	//	$content.= " :: <a href=\"#\" onClick='cur_sources_show(".$problem_id.")' id=\"show_sources\">Источники</a>";
+                
+	//			$content .= "</div>";
+//				if (isadmin()) {
+//				    $content .= "<div id=\"source_py\" style=\"display:none\"></div>";
+//				}
+//	        		if($subjects) {
+//					$content .= "<div id='subjects' style='display: none'><h1> </h1><div style='font-size:9pt; color:green;'><b>Темы: </b>";
+//				        foreach ($subjects as $subj) {	
+//					  $content .= " [<a href='http://".$_SERVER['SERVER_NAME']."/mod/statements/view_by_subject_new.php?parent=".$subj->subject_id."'>".$subj->name."</a>]";
+//					}		
+//		                	$content .= "</div></div>";
+//				}
+//				$content .= "<div id='add_subjects' style='display: none;'><div id='add_subjects_content' style='font-weight: normal; font-family: \"verdana\"'></div></div>";
+//				$content .= "<div id='add_sources' style='display: none;'><div id='add_sources_content' style='font-weight: normal; font-family: \"verdana\"'></div></div>";
+//				$content .= "<div id='cur_subjects' style='display: none;'><div id='cur_subjects_content' style='font-weight: normal; font-family: \"verdana\"'></div></div>";
+//				$content .= "<div id='cur_sources' style='display: none;'><div id='cur_sources_content' style='font-weight: normal; font-family: \"verdana\"'></div></div>";
         }
 		
         if($chapter->analysis) {
@@ -484,6 +539,8 @@ if ($show_statements) {
 	$content .='<script src="https://www.google.com/recaptcha/api.js"></script>';
     $content .='<script type="text/javascript" src="/mod/statements/lib/prism/prism.js"></script>';
     $content .='<link type="text/css" href="/mod/statements/lib/prism/prism.css" rel="stylesheet" />';
+#	<script>jQuery.post("/py/ideal/get_by_problem_html?problem_id=' . $chapterid . '" , {}, function(result) {jQuery("#ideal-solutions").html(result);prettyPrint();});</script>';
+#    $content .='<script>jQuery.get("/py/hint/get_by_problem_html?problem_id=' . $chapterid . '" , function(result) {jQuery("#hint-list").html(result);prettyPrint();});</script>';
     $limit_bl = limit_block($chapter);
     $lang_time_bl = lang_time_block($problem_id);
     
@@ -520,6 +577,7 @@ if ($show_statements) {
 			    $submits->setRunIdForShow($run_id);
 			}
 			$submits->setProblemId($problem_id);
+                        $submits->setCourseId($course->id);
 			$content .= "<div class='submit_box' align='center' width='100%' height='100%'>".$submits->getAJAXTable()."</div>";			
 		}
 	
@@ -566,7 +624,7 @@ if ($show_statements) {
                         }
 			$submits->setLangId($lang_id);
 			$submits->setStatusId($status_id);
-
+			$submits->setCourseId($course->id);
 			if (!isset($statements) || !$statements->id) {
 				$submits->setProblemId($problem_id);
 			}
@@ -717,6 +775,9 @@ if ($show_statements) {
         ";
         echo format_text($content, FORMAT_HTML, array("noclean" => true), $course->id);
     }
+if (isset($course)) {
+echo "<div id=\"course_id\" style=\"display:none\">".$course->id."</div>";
+}
 echo "<div id=\"statement_mode\"  style=\"display:none\">".$mode."</div>";
 echo $OUTPUT->footer();
 ?>

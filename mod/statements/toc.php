@@ -58,6 +58,10 @@ function statements_add_menu_block($chapter, $cmid=0) {
 function statements_add_group_selector_block($chapter, $statements, $cmid=0) {
     global $PAGE, $USER, $DB, $CFG;
     $content = "";
+    # if (!$chapter->output_only) {
+    #	$content .= "<div style='font-size:9pt;'>Данные вводятся с клавиатуры или из файла input.txt, выводятся на экран или в файл output.txt. Первые тесты не всегда совпадают с примерами из условия.</div>";
+    #}
+    #$content.="<div><a href='".$CFG->wwwroot."/mod/forum/view.php?id=331&problem_id=".$chapter->id."'>".get_string('question','statements')."</a></div>";
     $content .= "<div id='groups_nav' class='list-group'></div>";
 
      $content .= '<div id="MonitorResultLoadingTpl" style="display: none">
@@ -65,6 +69,10 @@ function statements_add_group_selector_block($chapter, $statements, $cmid=0) {
 	    		<span class="sr-only">Loading...</span>
 	 		</div>
 		</div>';
+    if ($cmid) {
+//        $content .= "<div> <a href='view.php?id=".$cmid."&submit'>Все посылки</a></div>";
+//        $content .= "<div> <a href='view.php?id=".$cmid."&standing'>Результаты</a></div>"; 
+    }
     $bc = new block_contents();
     $bc->title = "Список групп";
     $bc->attributes['class'] = 'block block_statements_menu';
@@ -72,6 +80,9 @@ function statements_add_group_selector_block($chapter, $statements, $cmid=0) {
     $PAGE->blocks->add_fake_block($bc, $PAGE->blocks->get_default_region());
 }
 
+/// fills:
+///   $toc
+///   $title (not for print)
 function statements_add_toc_block($chapters, $chapter, $statements, $cm, $edit = null) {
 	global $PAGE, $USER;
 	if ($edit === null) {
@@ -178,12 +189,22 @@ function statements_get_toc($chapters, $chapter, $book, $cm, $edit) {
 				$OUTPUT->pix_icon('t/'.$show_action, get_string($show_action.'chapter', 'mod_statements', $title)),
 				array('title' => get_string($show_action.'chapter', 'mod_statements', $titleunescaped)));
 		}
+//		$toc .= html_writer::end_tag('ul');
 		$toc .= html_writer::end_tag('li');
+//		$toc .= html_writer::end_tag('ul');
 		$first = 0;
 	}
 	$toc .= html_writer::end_tag('ul');
 	$toc .= html_writer::end_tag('div');
+	//$toc = str_replace('<ul></ul>', '', $toc); //cleanup of invalid structures
 	return $toc;
 } 
+
+//$bc_g = new block_contents();
+//$bc_g->title = get_string('result', 'mod_statements');
+//$bc_g->attributes['class'] = 'block block_statements_toc';
+//$bc_g->content = "qwe";
+//$defaultregion = $PAGE->blocks->get_default_region();
+//$PAGE->blocks->add_fake_block($bc_g, $defaultregion);
 
 ?>

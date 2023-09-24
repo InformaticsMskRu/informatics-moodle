@@ -4,7 +4,7 @@
 ///  Called by moodle_needs_upgrading() and /admin/index.php
 /////////////////////////////////////////////////////////////////////////////////
 
-$plugin->version  = 2020061600;  // The current module version (Date: YYYYMMDDXX)
+$plugin->version  = 20200616071;  // The current module version (Date: YYYYMMDDXX)
 $plugin->requires = 2020061500;  // Requires this Moodle version
 $plugin->cron     = 0;           // Period for cron to check this module (secs)
 $plugin->component = 'mod_statements';

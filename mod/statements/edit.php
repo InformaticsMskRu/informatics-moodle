@@ -27,6 +27,7 @@ if ($cmid==0) {
 	require_login($course, false, $cm);
 
 	$context = context_module::instance($cm->id);
+#require_capability('moodle/course:manageactivities', $context);
 	require_capability('moodle/site:edit_problem', $context);
 
 
@@ -90,6 +91,13 @@ unset($chapterid);
 
 /// If data submitted, then process and store.
 if (($form = data_submitted()) && (confirm_sesskey())) {
+    //TODO: skip it for now
+    //prepare data - security checks
+    //$form->title = clean_text($form->title, FORMAT_HTML);
+    //$form->content = clean_text($form->content, FORMAT_HTML);
+//        var_dump($chapter);
+//        die;	
+ 
     if ($chapter) {
         /// editing existing chapter
         $chapter->content = $form->content["text"];
@@ -98,9 +106,14 @@ if (($form = data_submitted()) && (confirm_sesskey())) {
         $chapter->name = $form->name;
 		$chapter->contest_id = $form->contest_id;
 		$chapter->problem_id = $form->select_problem;
+		///add slashes to all text fields
+	//        var_dump($chapter);
+        //die;	
  	if (!$DB->execute('UPDATE mdl_problems SET name = ?, content = ?, description = ?, analysis = ? WHERE mdl_problems.id = ?', array($chapter->name, $chapter->content, $chapter->description, $chapter->analysis, $chapter->id))) {
 			error('Could not update your statements');
 		}
+        //add_to_log($course->id, 'course', 'update mod', '../mod/statements/view.php?id='.$cm->id, 'statements '.$statements->id);
+        //add_to_log($course->id, 'statements', 'update', 'view3.php?id='.$cm->id.'&chapterid='.$chapter->id, $statements->id, $cm->id);
     } else {
         /// adding new chapter
         $chapter->statementsid = $statements->id;
@@ -116,7 +129,10 @@ if (($form = data_submitted()) && (confirm_sesskey())) {
 		$chapter->description = "\"".mysql_escape_string(addslashes($chapter->description))."\"";
 		$chapter->analysis = "\"".mysql_escape_string(addslashes($chapter->analysis))."\"";
 		$chapter->name = "\"".mysql_escape_string(addslashes($chapter->name))."\"";
+
+
 		
+		// ��������� ���� �� ��������� ������(  ������������ ����������� ������������ ����� � ejudge � ����� � moodle )
 		$tmp = $DB->get_records_sql("SELECT id FROM mdl_problems WHERE pr_id = ".$chapter->problem_id);
 		
 		if ($tmp)
@@ -124,6 +140,7 @@ if (($form = data_submitted()) && (confirm_sesskey())) {
 			error("Problem already exists");
 		}
 
+		// ��������� ��������� ��� ��������� �����
         foreach($chapters as $ch) {
             if ($ch->rank >= $chapter->rank) {
                 $ch->rank++;
@@ -133,12 +150,14 @@ if (($form = data_submitted()) && (confirm_sesskey())) {
             }
         }
 		
+		// ��������� ����� ������.
         if (!$DB->Execute('INSERT INTO mdl_problems(name,content,description,analysis,pr_id) VALUES ('.$chapter->name.','.$chapter->content.','.$chapter->description.','.$chapter->analysis.','.$chapter->problem_id.')')) {
             error('Could not insert a new chapter');
         }
 
 		$chapter->id = $DB->Insert_ID();
 
+		// ��������� ������������ statement � ������ .
         if (!$DB->Execute('INSERT INTO mdl_statements_problems_correlation(statement_id,problem_id,rank) VALUES ('.$statements->id.','.$chapter->id.','.$chapter->rank.')')) {
             error('Could not insert a new chapter_statement_correlation');
         }			
@@ -158,6 +177,8 @@ $stredit = get_string('edit');
 $pageheading = get_string('editingchapter', 'statements');
 
 $usehtmleditor = 0;
+//UNCOMMENT THIS TO ENABLE WYSIWYG EDITOR 
+//$usehtmleditor = can_use_html_editor() && isadmin();
 
 if (!$chapter) {
     $chapter->id = -1;
@@ -188,6 +209,10 @@ foreach ($contests as $contest) {
 	$contest->problems = $problems;
 }
 
+#$ret = $DB->get_record_sql("SELECT mdl_ejudge_problem.problem_id,mdl_ejudge_problem.contest_id FROM mdl_problems,mdl_ejudge_problem WHERE mdl_ejudge_problem.id = ".$chapter->pr_id);
+
+#$chapter->contest_id = $ret->contest_id;
+#$chapter->problem_id = $chapter->pr_id;
 
 include('edit.html');
 

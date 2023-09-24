@@ -1,5 +1,8 @@
 <?php 
 
+#require_once('../../config.php');
+
+
 function limit_block($chapter) {
     $t_val = floor(($chapter->timelimit) * 100) / 100.0;
     $m_val = ($chapter->memorylimit / 1024.0 / 1024.0);
@@ -16,4 +19,5 @@ function limit_block($chapter) {
     return $table;
 }
  
+#echo lang_time_block(1291);
 ?>
