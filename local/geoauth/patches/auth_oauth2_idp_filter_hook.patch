@@ -1,0 +1,10 @@
+--- a/auth/oauth2/classes/auth.php
++++ b/auth/oauth2/classes/auth.php
+@@ -197,6 +197,9 @@ class auth extends \auth_plugin_base {
+             }
+         }
++        if (function_exists('local_geoauth_filter_idp_list')) {
++            $result = local_geoauth_filter_idp_list($result);
++        }
+         return $result;
+     }
