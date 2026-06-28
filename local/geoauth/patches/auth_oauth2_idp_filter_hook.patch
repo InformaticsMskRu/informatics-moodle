@@ -1,0 +1,8 @@
+--- a/auth/oauth2/classes/auth.php
++++ b/auth/oauth2/classes/auth.php
+@@ -197,6 +197,7 @@ class auth extends \auth_plugin_base {
+             }
+         }
++        $result = component_callback('local_geoauth', 'filter_idp_list', [$result], $result);
+         return $result;
+     }
