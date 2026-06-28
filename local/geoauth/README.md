@@ -36,9 +36,7 @@ patch -p1 < /path/to/local/geoauth/patches/auth_oauth2_idp_filter_hook.patch
 If the patch no longer applies cleanly, manually add these 3 lines at the end of `loginpage_idp_list()` in `auth/oauth2/classes/auth.php`, just before `return $result`:
 
 ```php
-if (function_exists('local_geoauth_filter_idp_list')) {
-    $result = local_geoauth_filter_idp_list($result);
-}
+$result = component_callback('local_geoauth', 'filter_idp_list', [$result], $result);
 ```
 
 ## Configuration
