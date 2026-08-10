@@ -554,12 +554,13 @@ if ($show_statements) {
         $header_bl = "";
     }
 	if ($USER->id == 469) {
-		// Experimental, user 469 only: the statement is loaded from the API (js/statement_api.js).
+		// Experimental, user 469 only: the statement and sample tests are loaded
+		// from the API and rendered client-side (js/statement_api.js).
 		$content .= "<div class='statement-api-content' data-problem-id='" . intval($problem_id) . "'></div>";
 	} else {
 		$content .= $chapter->content;
+		$content .= $chapter->sample_tests_html;
 	}
-    $content .= $chapter->sample_tests_html;
     if (has_capability('moodle/site:edit_problem', context_system::instance())) {
 	    $content .= "<div id='problem_panel' class='bootstrap'> 
     	<button type='button' id='problem_tests_load' class='btn btn-light'>Показать тесты</button> 
