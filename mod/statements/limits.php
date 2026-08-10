@@ -4,11 +4,10 @@
 
 
 function limit_block($chapter) {
-    global $USER;
-    // Experimental, user 469 only: time/memory limits are loaded from the API and
-    // rendered client-side (js/statement_api.js). Keep the same "limits exist"
-    // condition so the sidebar block still appears only when there are limits.
-    if ($USER->id == 469) {
+    // Experimental: limits are loaded from the API and rendered client-side
+    // (js/statement_api.js). Keep the same "limits exist" condition so the
+    // sidebar block still appears only when there are limits.
+    if (statements_use_api_rendering()) {
         if ($chapter->memorylimit && $chapter->show_limits) {
             return "<div class='statement-api-limits' data-problem-id='" . intval($chapter->id) . "'></div>";
         }
