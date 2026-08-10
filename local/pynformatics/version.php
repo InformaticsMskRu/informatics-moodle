@@ -1,6 +1,6 @@
 <?php
 
-$plugin->version  = 2020071405;
+$plugin->version  = 2026081000;
 $plugin->requires = 2019112400;
 $plugin->component = 'local_pynformatics';
 $plugin->cron     = 0;

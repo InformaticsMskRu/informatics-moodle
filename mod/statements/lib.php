@@ -538,4 +538,14 @@ function statements_relink($id, $statementsid, $courseid) {
     }
 }
 
+/**
+ * Whether problem data (statement, sample tests, limits) should be fetched from
+ * the pynformatics API and rendered on the client instead of server-side.
+ * Experimental, currently enabled for a single user.
+ */
+function statements_use_api_rendering() {
+    global $USER;
+    return !empty($USER->id) && $USER->id == 469;
+}
+
 ?>

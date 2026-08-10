@@ -206,6 +206,10 @@ $PAGE->requires->js(new moodle_url("js/handlebars.js"));
 $PAGE->requires->js(new moodle_url("js/ajaxupload.js"));
 $PAGE->requires->js(new moodle_url("js/map.js"));
 $PAGE->requires->js(new moodle_url("js/module.js"));
+if (statements_use_api_rendering()) {
+    // Experimental: problem data is loaded from the API and rendered client-side.
+    $PAGE->requires->js(new moodle_url("js/statement_api.js"));
+}
 
 if (!$without_course)
 {
@@ -541,16 +545,14 @@ if ($show_statements) {
     $content .='<link type="text/css" href="/mod/statements/lib/prism/prism.css" rel="stylesheet" />';
 #	<script>jQuery.post("/py/ideal/get_by_problem_html?problem_id=' . $chapterid . '" , {}, function(result) {jQuery("#ideal-solutions").html(result);prettyPrint();});</script>';
 #    $content .='<script>jQuery.get("/py/hint/get_by_problem_html?problem_id=' . $chapterid . '" , function(result) {jQuery("#hint-list").html(result);prettyPrint();});</script>';
-    $limit_bl = limit_block($chapter);
-    $lang_time_bl = lang_time_block($problem_id);
-    
-    if (!$chapter->output_only) {
-        $header_bl = "<table border='0' width='100%'><tr><td>".$limit_bl."</td><td>".$lang_time_bl."</td></tr></table>";
-    } else {
-        $header_bl = "";
-    }
-	$content .= $chapter->content;
-    $content .= $chapter->sample_tests_html;
+	if (statements_use_api_rendering()) {
+		// Experimental: statement and sample tests are loaded from the API and
+		// rendered client-side (js/statement_api.js).
+		$content .= "<div class='statement-api-content' data-problem-id='" . intval($problem_id) . "'></div>";
+	} else {
+		$content .= $chapter->content;
+		$content .= $chapter->sample_tests_html;
+	}
     if (has_capability('moodle/site:edit_problem', context_system::instance())) {
 	    $content .= "<div id='problem_panel' class='bootstrap'> 
     	<button type='button' id='problem_tests_load' class='btn btn-light'>Показать тесты</button> 

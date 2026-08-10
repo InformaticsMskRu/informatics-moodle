@@ -4,6 +4,16 @@
 
 
 function limit_block($chapter) {
+    // Experimental: limits are loaded from the API and rendered client-side
+    // (js/statement_api.js). Keep the same "limits exist" condition so the
+    // sidebar block still appears only when there are limits.
+    if (statements_use_api_rendering()) {
+        if ($chapter->memorylimit && $chapter->show_limits) {
+            return "<div class='statement-api-limits' data-problem-id='" . intval($chapter->id) . "'></div>";
+        }
+        return '';
+    }
+
     $t_val = floor(($chapter->timelimit) * 100) / 100.0;
     $m_val = ($chapter->memorylimit / 1024.0 / 1024.0);
 
