@@ -23,6 +23,14 @@ $local_pynformatics_capabilities = array(
 		'captype' => 'read',
 		'contextlevel' => CONTEXT_SYSTEM,
 	),
+	'local/pynformatics:problem_admin' => array(
+		'captype' => 'read',
+		'contextlevel' => CONTEXT_SYSTEM,
+	),
+	'local/pynformatics:problem_view_analysis' => array(
+		'captype' => 'read',
+		'contextlevel' => CONTEXT_SYSTEM,
+	),
 	'moodle/ejudge_submits:comment' => array(
 		'captype' => 'read',
 		'contextlevel' => CONTEXT_SYSTEM,

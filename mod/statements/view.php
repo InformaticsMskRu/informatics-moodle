@@ -206,6 +206,10 @@ $PAGE->requires->js(new moodle_url("js/handlebars.js"));
 $PAGE->requires->js(new moodle_url("js/ajaxupload.js"));
 $PAGE->requires->js(new moodle_url("js/map.js"));
 $PAGE->requires->js(new moodle_url("js/module.js"));
+if ($USER->id == 469) {
+    // Экспериментально для пользователя 469: условие подгружается из API и отрисовывается на клиенте.
+    $PAGE->requires->js(new moodle_url("js/statement_api.js"));
+}
 
 if (!$without_course)
 {
@@ -549,7 +553,12 @@ if ($show_statements) {
     } else {
         $header_bl = "";
     }
-	$content .= $chapter->content;
+	if ($USER->id == 469) {
+		// Экспериментально для пользователя 469: условие подгружается из API (js/statement_api.js).
+		$content .= "<div class='statement-api-content' data-problem-id='" . intval($problem_id) . "'></div>";
+	} else {
+		$content .= $chapter->content;
+	}
     $content .= $chapter->sample_tests_html;
     if (has_capability('moodle/site:edit_problem', context_system::instance())) {
 	    $content .= "<div id='problem_panel' class='bootstrap'> 
