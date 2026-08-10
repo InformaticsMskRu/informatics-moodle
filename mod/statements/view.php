@@ -207,7 +207,7 @@ $PAGE->requires->js(new moodle_url("js/ajaxupload.js"));
 $PAGE->requires->js(new moodle_url("js/map.js"));
 $PAGE->requires->js(new moodle_url("js/module.js"));
 if ($USER->id == 469) {
-    // Экспериментально для пользователя 469: условие подгружается из API и отрисовывается на клиенте.
+    // Experimental, user 469 only: the statement is loaded from the API and rendered client-side.
     $PAGE->requires->js(new moodle_url("js/statement_api.js"));
 }
 
@@ -554,7 +554,7 @@ if ($show_statements) {
         $header_bl = "";
     }
 	if ($USER->id == 469) {
-		// Экспериментально для пользователя 469: условие подгружается из API (js/statement_api.js).
+		// Experimental, user 469 only: the statement is loaded from the API (js/statement_api.js).
 		$content .= "<div class='statement-api-content' data-problem-id='" . intval($problem_id) . "'></div>";
 	} else {
 		$content .= $chapter->content;

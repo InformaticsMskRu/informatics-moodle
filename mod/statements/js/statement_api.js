@@ -1,6 +1,6 @@
-// Подгружает условие задачи из API pynformatics и отрисовывает его на клиенте.
-// Активируется для каждого элемента с классом .statement-api-content,
-// id задачи берётся из data-атрибута problem-id.
+// Loads a problem statement from the pynformatics API and renders it client-side.
+// Runs for every element with the .statement-api-content class;
+// the problem id is taken from the problem-id data attribute.
 (function() {
     function renderStatementFromApi(container) {
         var problemId = container.getAttribute('data-problem-id');
@@ -18,7 +18,7 @@
             })
             .catch(function(error) {
                 if (window.console) {
-                    console.error('Не удалось загрузить условие из API', error);
+                    console.error('Failed to load the problem statement from the API', error);
                 }
             });
     }
