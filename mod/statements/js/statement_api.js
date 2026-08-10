@@ -18,28 +18,25 @@
         return '<a href="' + url + '">' + escapeHtml(text) + '</a>';
     }
 
-    // The site renders TeX with MathJax (Moodle's filter_mathjaxloader,
-    // configured with skipStartupTypeset), which typesets at page load — before
-    // we inject the statement over fetch, so the freshly added TeX would stay
-    // raw. Re-run MathJax on the container after injecting it. Supports MathJax
-    // v2 (Hub) and v3 (typesetPromise); no-op when MathJax is absent.
-    function typesetMath(element) {
-        var mathJax = window.MathJax;
-        if (!mathJax) {
+    // TeX is rendered by MathJax via Moodle's filter_mathjaxloader, which loads
+    // MathJax lazily — only when the server-rendered page already contains math.
+    // For user 469 the statement comes from the API, so the server page has no
+    // math and MathJax may never be loaded (window.MathJax is undefined). So we
+    // don't call MathJax directly; instead we notify Moodle's filters about the
+    // injected content: the mathjaxloader loads MathJax on demand and typesets
+    // the new nodes. It only typesets elements with the .filter_mathjaxloader_equation
+    // class, so renderStatement wraps the content in that span (as the server
+    // filter does). Falls back to a direct MathJax call if the AMD loader is absent.
+    function typesetMath(container) {
+        if (typeof window.require === 'function') {
+            window.require(['core/event'], function(event) {
+                event.notifyFilterContentUpdated(container);
+            });
             return;
         }
-        try {
-            if (mathJax.Hub && typeof mathJax.Hub.Queue === 'function') {
-                // MathJax v2
-                mathJax.Hub.Queue(['Typeset', mathJax.Hub, element]);
-            } else if (typeof mathJax.typesetPromise === 'function') {
-                // MathJax v3
-                mathJax.typesetPromise([element]);
-            }
-        } catch (error) {
-            if (window.console) {
-                console.error('MathJax processing failed', error);
-            }
+        var mathJax = window.MathJax;
+        if (mathJax && mathJax.Hub && typeof mathJax.Hub.Queue === 'function') {
+            mathJax.Hub.Queue(['Typeset', mathJax.Hub, container]);
         }
     }
 
@@ -51,7 +48,9 @@
         if (typeof data.sample_tests_html === 'string') {
             html += data.sample_tests_html;
         }
-        container.innerHTML = html;
+        // Wrap in the class the mathjax filter typesets (mirrors the server-side
+        // filter output) so notifyFilterContentUpdated picks the TeX up.
+        container.innerHTML = '<span class="filter_mathjaxloader_equation">' + html + '</span>';
         typesetMath(container);
     }
 
