@@ -18,26 +18,27 @@
         return '<a href="' + url + '">' + escapeHtml(text) + '</a>';
     }
 
-    // jsMath typesets math at page load, before we inject the statement over
-    // fetch, so the freshly added TeX would stay unprocessed. Re-run jsMath on
-    // the container after injecting it. Synchronize waits until jsMath has
-    // finished loading before processing. No-op when jsMath is absent.
+    // The site renders TeX with MathJax (Moodle's filter_mathjaxloader,
+    // configured with skipStartupTypeset), which typesets at page load — before
+    // we inject the statement over fetch, so the freshly added TeX would stay
+    // raw. Re-run MathJax on the container after injecting it. Supports MathJax
+    // v2 (Hub) and v3 (typesetPromise); no-op when MathJax is absent.
     function typesetMath(element) {
-        var jsMath = window.jsMath;
-        if (!jsMath) {
+        var mathJax = window.MathJax;
+        if (!mathJax) {
             return;
         }
         try {
-            if (typeof jsMath.Synchronize === 'function') {
-                jsMath.Synchronize(function() {
-                    jsMath.Process(element);
-                });
-            } else if (typeof jsMath.Process === 'function') {
-                jsMath.Process(element);
+            if (mathJax.Hub && typeof mathJax.Hub.Queue === 'function') {
+                // MathJax v2
+                mathJax.Hub.Queue(['Typeset', mathJax.Hub, element]);
+            } else if (typeof mathJax.typesetPromise === 'function') {
+                // MathJax v3
+                mathJax.typesetPromise([element]);
             }
         } catch (error) {
             if (window.console) {
-                console.error('jsMath processing failed', error);
+                console.error('MathJax processing failed', error);
             }
         }
     }
