@@ -178,9 +178,9 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
 		return false;                           
 	});
 
-    jQuery( "#invert_limits" ).click(function() {
-		var problem_id = $("#problem_data").attr("problem_id");
-		var limit_action = $("#problem_data").attr("limit_action");
+    jQuery(document).on("change", "#invert_limits", function() {
+		var problem_id = jQuery(this).data("problem-id");
+		var limit_action = jQuery(this).data("limit-action");
        	jQuery.get(
 			"/py/problem/" + problem_id + "/limits/" + limit_action,
 			'',
@@ -188,7 +188,6 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
 				location.reload();
 			}
 		);
-		return false;                           
 	});
 
 

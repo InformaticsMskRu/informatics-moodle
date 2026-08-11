@@ -11,6 +11,22 @@ defined('MOODLE_INTERNAL') or die('Direct access to this script is forbidden.');
 ///   $statements - statements
 ///   $edit - force editing view
 
+// Renders the "Показать/спрятать лимиты" control as a switch. The checked state
+// mirrors $chapter->show_limits; the data attributes drive the API call in
+// js/module.js, which reloads the page after flipping the flag.
+function statement_limits_toggle($chapter) {
+    $shown = !empty($chapter->show_limits);
+    $action = $shown ? 'hide' : 'show';
+    $checked = $shown ? ' checked' : '';
+    return "<label class='moodle-toggle' title='Show limits'>"
+        . "<input type='checkbox' id='invert_limits' class='moodle-toggle-input'"
+        . " data-problem-id='" . intval($chapter->id) . "'"
+        . " data-limit-action='" . $action . "'" . $checked . ">"
+        . "<span class='moodle-toggle-track'><span class='moodle-toggle-thumb'></span></span>"
+        . "<span class='moodle-toggle-text'>Показывать лимиты</span>"
+        . "</label>";
+}
+
 function statement_add_limits($chapter) {
     global $PAGE, $DB;
     $bc = new block_contents();
@@ -37,6 +53,7 @@ function statement_add_limits($chapter) {
             $url = new moodle_url("/cgi-bin/new-master", array("contest_id"=>$cont[1]->ejudge_id));
             $bc->content = $cont[1]->n." <a href='".$url."'>".$string."</a>";
         }
+        $bc->content .= statement_limits_toggle($chapter);
         $PAGE->blocks->add_fake_block($bc, $PAGE->blocks->get_default_region());
     }
 }
