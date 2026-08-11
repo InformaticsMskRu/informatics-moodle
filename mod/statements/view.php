@@ -484,8 +484,6 @@ if ($show_statements) {
         //  $content .= " :: <a href=\"#\" onClick='hint_toggle();'>Подсказки</a>";
 	//			}
 
-               // "Показать/спрятать лимиты" moved to the "Служебное" sidebar
-               // block as a toggle (see statement_add_limits() in toc.php).
 	//	if (isadmin()) {
 	//		$content.= " :: <a href=\"#\" onClick='add_sources_show(".$problem_id.")' id=\"show_sources\">Редактировать источники</a>";
 	//	}
