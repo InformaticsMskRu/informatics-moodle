@@ -74,20 +74,29 @@
     // target, each prefixed with the judge name resolved from judges.json.
     function renderService(container, data) {
         var lines = [];
-        if (data.ejudge_contest_id) {
+        var settings = Array.isArray(data.judges_settings) ? data.judges_settings : [];
+        // judges_settings reroutes the problem to explicit judges, so the
+        // default ejudge_contest_id no longer points at the real judge — show
+        // it only when there is no per-judge routing. (The API already omits
+        // ejudge_contest_id in that case; this guard keeps the client correct
+        // even if it is present.)
+        if (data.ejudge_contest_id && settings.length === 0) {
             lines.push(masterLink(data.ejudge_contest_id,
                 data.ejudge_contest_id + '/' + (data.short_id || '')));
         }
-        if (Array.isArray(data.judges_settings)) {
-            data.judges_settings.forEach(function(entry) {
-                if (!entry || !entry.contest_id) {
-                    return;
-                }
-                var prefix = entry.judge_name || ('judge ' + entry.judge_id);
-                lines.push(escapeHtml(prefix) + ': ' +
-                    masterLink(entry.contest_id, entry.contest_id + '/' + entry.problem_id));
-            });
-        }
+        settings.forEach(function(entry) {
+            if (!entry || !entry.contest_id) {
+                return;
+            }
+            var prefix = entry.judge_name || ('judge ' + entry.judge_id);
+            var text = entry.contest_id + '/' + entry.problem_id;
+            // The API returns a ready-to-use master url (entry.url); render it
+            // as-is instead of rebuilding the link on the client.
+            var link = entry.url
+                ? '<a href="' + escapeHtml(entry.url) + '">' + escapeHtml(text) + '</a>'
+                : masterLink(entry.contest_id, text);
+            lines.push(escapeHtml(prefix) + ': ' + link);
+        });
         container.innerHTML = lines.join('<br/>');
     }
 
