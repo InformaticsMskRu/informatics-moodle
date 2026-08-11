@@ -186,13 +186,7 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
 		toggle.prop("disabled", true);
 		jQuery.get("/py/problem/" + problem_id + "/limits/" + limit_action)
 			.done(function() {
-				if (window.StatementApi && window.StatementApi.refreshLimits) {
-					// API rendering: refetch and update the limits block in place.
-					window.StatementApi.refreshLimits(problem_id, show);
-				} else {
-					// Legacy server-rendered limits: reload to re-render them.
-					location.reload();
-				}
+				window.StatementApi.refreshLimits(problem_id, show);
 			})
 			.always(function() {
 				toggle.prop("disabled", false);
