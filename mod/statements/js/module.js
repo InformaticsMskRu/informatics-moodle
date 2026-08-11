@@ -178,17 +178,19 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
 		return false;                           
 	});
 
-    jQuery( "#invert_limits" ).click(function() {
-		var problem_id = $("#problem_data").attr("problem_id");
-		var limit_action = $("#problem_data").attr("limit_action");
-       	jQuery.get(
-			"/py/problem/" + problem_id + "/limits/" + limit_action,
-			'',
-			function() {
-				location.reload();
-			}
-		);
-		return false;                           
+    jQuery(document).on("change", "#invert_limits", function() {
+		var toggle = jQuery(this);
+		var problem_id = toggle.data("problem-id");
+		var show = toggle.is(":checked");
+		var limit_action = show ? "show" : "hide";
+		toggle.prop("disabled", true);
+		jQuery.get("/py/problem/" + problem_id + "/limits/" + limit_action)
+			.done(function() {
+				window.StatementApi.refreshLimits(problem_id, show);
+			})
+			.always(function() {
+				toggle.prop("disabled", false);
+			});
 	});
 
 

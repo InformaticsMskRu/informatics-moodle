@@ -11,6 +11,19 @@ defined('MOODLE_INTERNAL') or die('Direct access to this script is forbidden.');
 ///   $statements - statements
 ///   $edit - force editing view
 
+// Renders the "Показать/спрятать лимиты" control as a switch. The checked state
+// mirrors $chapter->show_limits; the data attributes drive the API call in
+// js/module.js, which reloads the page after flipping the flag.
+function statement_limits_toggle($chapter) {
+    $checked = !empty($chapter->show_limits) ? ' checked' : '';
+    return "<label class='moodle-toggle' title='Show limits'>"
+        . "<input type='checkbox' id='invert_limits' class='moodle-toggle-input'"
+        . " data-problem-id='" . intval($chapter->id) . "'" . $checked . ">"
+        . "<span class='moodle-toggle-track'><span class='moodle-toggle-thumb'></span></span>"
+        . "<span class='moodle-toggle-text'>Показывать лимиты</span>"
+        . "</label>";
+}
+
 function statement_add_limits($chapter) {
     global $PAGE, $DB;
     $bc = new block_contents();
@@ -20,8 +33,13 @@ function statement_add_limits($chapter) {
     $bc_limit = new block_contents();
     $bc_limit->title = 'Ограничения';
     $bc_limit->attributes['class'] = 'block block_statements_menu';
-    $bc_limit->content = limit_block($chapter); 
+    $bc_limit->content = limit_block($chapter);
     if (strlen($bc_limit->content) > 0) {
+        // limit_block() emits the container for admins even when limits are
+        // hidden; keep the block itself hidden until the toggle shows it.
+        if (empty($chapter->show_limits)) {
+            $bc_limit->attributes['class'] .= ' statements-limits-block-hidden';
+        }
         $PAGE->blocks->add_fake_block($bc_limit, $PAGE->blocks->get_default_region());
     }
 
@@ -30,6 +48,9 @@ function statement_add_limits($chapter) {
             // Experimental: the service block (ejudge links) is loaded from the API
             // and rendered client-side (js/statement_api.js).
             $bc->content = "<div class='statement-api-service' data-problem-id='" . intval($chapter->id) . "'></div>";
+            // The toggle updates the limits block in place via the API, so it is
+            // only offered in API-rendering mode.
+            $bc->content .= statement_limits_toggle($chapter);
         } else {
             $query='SELECT 1,ejudge_id,mdl_ejudge_contest.name as n,mdl_ejudge_problem.short_id as letter from mdl_problems, mdl_ejudge_contest, mdl_ejudge_problem where mdl_problems.pr_id=mdl_ejudge_problem.id AND mdl_ejudge_contest.id=mdl_ejudge_problem.contest_id AND mdl_problems.id='.$chapter->id;
             $cont=$DB->get_records_sql($query);
