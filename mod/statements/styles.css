@@ -223,6 +223,12 @@
 }
 
 
+/* Limits block kept in the DOM (as a live-update target) but hidden until the
+   "Служебное" toggle shows it. */
+.statements-limits-block-hidden {
+    display: none;
+}
+
 /* "Показать/спрятать лимиты" switch in the "Служебное" sidebar block */
 .moodle-toggle {
     display: flex;

@@ -54,9 +54,26 @@
         typesetMath(container);
     }
 
+    // Shows or hides the sidebar block that wraps the limits container. The
+    // block is emitted for admins even when limits are hidden (limits.php), so
+    // the toggle can reveal it without a page reload.
+    function setLimitsBlockHidden(container, hidden) {
+        var block = container.closest ? container.closest('.block') : null;
+        if (block) {
+            block.classList.toggle('statements-limits-block-hidden', hidden);
+        }
+    }
+
     // Mirrors limit_block() in limits.php: timelimit floored to 2 decimals in
     // seconds, memorylimit in MiB; timelimit is shown only when positive.
+    // Rendering is skipped (and the block hidden) when show_limits is off.
     function renderLimits(container, data) {
+        var show = container.getAttribute('data-show-limits') !== '0';
+        if (!show) {
+            container.innerHTML = '';
+            setLimitsBlockHidden(container, true);
+            return;
+        }
         var html = '';
         if (typeof data.timelimit === 'number' && data.timelimit > 0) {
             var seconds = Math.floor(data.timelimit * 100) / 100;
@@ -67,6 +84,37 @@
             html += '<i class="icon fa fa-table fa-fw" aria-hidden="true"></i>' + mib + ' MiB<br/>';
         }
         container.innerHTML = html;
+        setLimitsBlockHidden(container, false);
+    }
+
+    // Re-fetches the problem and re-renders its limits without a page reload.
+    // Called by js/module.js after the "Служебное" toggle flips show_limits.
+    function refreshLimits(problemId, show) {
+        var containers = document.querySelectorAll(
+            '.statement-api-limits[data-problem-id="' + String(problemId).replace(/"/g, '') + '"]');
+        if (!containers.length) {
+            return;
+        }
+        for (var i = 0; i < containers.length; i++) {
+            containers[i].setAttribute('data-show-limits', show ? '1' : '0');
+        }
+        fetch('/py/problem/' + encodeURIComponent(problemId) + '/json', {credentials: 'same-origin'})
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (!data) {
+                    return;
+                }
+                for (var i = 0; i < containers.length; i++) {
+                    renderLimits(containers[i], data);
+                }
+            })
+            .catch(function(error) {
+                if (window.console) {
+                    console.error('Failed to refresh the limits from the API', error);
+                }
+            });
     }
 
     // Mirrors the "Служебное" block in toc.php: a new-master link for the
@@ -150,6 +198,10 @@
             render(problemId, groups[problemId]);
         });
     }
+
+    // Lets js/module.js refresh the limits block after the toggle flips the flag.
+    window.StatementApi = window.StatementApi || {};
+    window.StatementApi.refreshLimits = refreshLimits;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

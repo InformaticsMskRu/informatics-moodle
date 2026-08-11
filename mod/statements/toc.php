@@ -15,13 +15,10 @@ defined('MOODLE_INTERNAL') or die('Direct access to this script is forbidden.');
 // mirrors $chapter->show_limits; the data attributes drive the API call in
 // js/module.js, which reloads the page after flipping the flag.
 function statement_limits_toggle($chapter) {
-    $shown = !empty($chapter->show_limits);
-    $action = $shown ? 'hide' : 'show';
-    $checked = $shown ? ' checked' : '';
+    $checked = !empty($chapter->show_limits) ? ' checked' : '';
     return "<label class='moodle-toggle' title='Show limits'>"
         . "<input type='checkbox' id='invert_limits' class='moodle-toggle-input'"
-        . " data-problem-id='" . intval($chapter->id) . "'"
-        . " data-limit-action='" . $action . "'" . $checked . ">"
+        . " data-problem-id='" . intval($chapter->id) . "'" . $checked . ">"
         . "<span class='moodle-toggle-track'><span class='moodle-toggle-thumb'></span></span>"
         . "<span class='moodle-toggle-text'>Показывать лимиты</span>"
         . "</label>";
@@ -36,8 +33,13 @@ function statement_add_limits($chapter) {
     $bc_limit = new block_contents();
     $bc_limit->title = 'Ограничения';
     $bc_limit->attributes['class'] = 'block block_statements_menu';
-    $bc_limit->content = limit_block($chapter); 
+    $bc_limit->content = limit_block($chapter);
     if (strlen($bc_limit->content) > 0) {
+        // limit_block() emits the container for admins even when limits are
+        // hidden; keep the block itself hidden until the toggle shows it.
+        if (empty($chapter->show_limits)) {
+            $bc_limit->attributes['class'] .= ' statements-limits-block-hidden';
+        }
         $PAGE->blocks->add_fake_block($bc_limit, $PAGE->blocks->get_default_region());
     }
 
