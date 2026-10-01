@@ -20,7 +20,7 @@
 
     // TeX is rendered by MathJax via Moodle's filter_mathjaxloader, which loads
     // MathJax lazily — only when the server-rendered page already contains math.
-    // For user 469 the statement comes from the API, so the server page has no
+    // The statement comes from the API, so the server page has no
     // math and MathJax may never be loaded (window.MathJax is undefined). So we
     // don't call MathJax directly; instead we notify Moodle's filters about the
     // injected content: the mathjaxloader loads MathJax on demand and typesets

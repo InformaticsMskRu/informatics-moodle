@@ -207,7 +207,7 @@ $PAGE->requires->js(new moodle_url("js/ajaxupload.js"));
 $PAGE->requires->js(new moodle_url("js/map.js"));
 $PAGE->requires->js(new moodle_url("js/module.js"));
 if (statements_use_api_rendering()) {
-    // Experimental: problem data is loaded from the API and rendered client-side.
+    // Problem data is loaded from the API and rendered client-side.
     $PAGE->requires->js(new moodle_url("js/statement_api.js"));
 }
 
@@ -542,7 +542,7 @@ if ($show_statements) {
 #	<script>jQuery.post("/py/ideal/get_by_problem_html?problem_id=' . $chapterid . '" , {}, function(result) {jQuery("#ideal-solutions").html(result);prettyPrint();});</script>';
 #    $content .='<script>jQuery.get("/py/hint/get_by_problem_html?problem_id=' . $chapterid . '" , function(result) {jQuery("#hint-list").html(result);prettyPrint();});</script>';
 	if (statements_use_api_rendering()) {
-		// Experimental: statement and sample tests are loaded from the API and
+		// Statement and sample tests are loaded from the API and
 		// rendered client-side (js/statement_api.js).
 		$content .= "<div class='statement-api-content' data-problem-id='" . intval($problem_id) . "'></div>";
 	} else {

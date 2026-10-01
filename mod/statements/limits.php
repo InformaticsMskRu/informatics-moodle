@@ -4,7 +4,7 @@
 
 
 function limit_block($chapter) {
-    // Experimental: limits are loaded from the API and rendered client-side
+    // Limits are loaded from the API and rendered client-side
     // (js/statement_api.js). Keep the same "limits exist" condition so the
     // sidebar block still appears only when there are limits.
     if (statements_use_api_rendering()) {

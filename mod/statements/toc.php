@@ -45,7 +45,7 @@ function statement_add_limits($chapter) {
 
     if (has_capability('moodle/site:edit_problem', context_system::instance()) && isset($chapter)) {
         if (statements_use_api_rendering()) {
-            // Experimental: the service block (ejudge links) is loaded from the API
+            // The service block (ejudge links) is loaded from the API
             // and rendered client-side (js/statement_api.js).
             $bc->content = "<div class='statement-api-service' data-problem-id='" . intval($chapter->id) . "'></div>";
             // The toggle updates the limits block in place via the API, so it is
