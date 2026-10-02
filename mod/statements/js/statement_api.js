@@ -1,7 +1,8 @@
 // Loads a problem statement, its sample tests, its time/memory limits and the
 // "Служебное" ejudge links from the pynformatics API and renders them
 // client-side. Fills elements with .statement-api-content (statement + samples),
-// .statement-api-limits (limits) and .statement-api-service (ejudge links); the
+// .statement-api-limits (limits), .statement-api-service (ejudge links) and
+// .statement-api-languages (the submit form's language dropdown); the
 // problem id is taken from the problem-id data attribute. Each problem is fetched
 // once even when several containers reference it.
 (function() {
@@ -148,8 +149,34 @@
         container.innerHTML = lines.join('<br/>');
     }
 
+    // Fills the language dropdown of the submit form (see submit_form.php) with
+    // the languages the user can submit this problem in. The click handler in
+    // js/module.js is delegated, so the added options work without rebinding.
+    // The first option is selected: the form's built-in default may not be
+    // offered for this problem.
+    function renderLanguages(container, data) {
+        if (!Array.isArray(data.languages)) {
+            return;
+        }
+        container.innerHTML = data.languages.map(function(lang) {
+            return '<a class="dropdown-item lang_choose_option" id="lang_choose_option" value="' +
+                escapeHtml(lang.id) + '" href="#">' + escapeHtml(lang.name) + '</a>';
+        }).join('');
+        var first = container.querySelector('a.lang_choose_option');
+        if (first) {
+            first.click();
+        }
+    }
+
     function render(problemId, group) {
-        fetch('/py/problem/' + encodeURIComponent(problemId) + '/json', {credentials: 'same-origin'})
+        var url = '/py/problem/' + encodeURIComponent(problemId) + '/json';
+        // the statement's allowed_languages narrows the languages
+        var statementNode = document.getElementById('statement_id');
+        var statementId = statementNode ? parseInt(statementNode.textContent, 10) : NaN;
+        if (group.languages.length && statementId > 0) {
+            url += '?statement_id=' + statementId;
+        }
+        fetch(url, {credentials: 'same-origin'})
             .then(function(response) {
                 return response.json();
             })
@@ -165,6 +192,9 @@
                 });
                 group.service.forEach(function(container) {
                     renderService(container, data);
+                });
+                group.languages.forEach(function(container) {
+                    renderLanguages(container, data);
                 });
             })
             .catch(function(error) {
@@ -185,7 +215,7 @@
                     continue;
                 }
                 if (!groups[problemId]) {
-                    groups[problemId] = {statement: [], limits: [], service: []};
+                    groups[problemId] = {statement: [], limits: [], service: [], languages: []};
                 }
                 groups[problemId][key].push(nodes[i]);
             }
@@ -193,6 +223,7 @@
         collect('.statement-api-content', 'statement');
         collect('.statement-api-limits', 'limits');
         collect('.statement-api-service', 'service');
+        collect('.statement-api-languages', 'languages');
 
         Object.keys(groups).forEach(function(problemId) {
             render(problemId, groups[problemId]);

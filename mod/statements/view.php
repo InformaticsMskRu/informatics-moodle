@@ -205,10 +205,14 @@ $PAGE->requires->js(new moodle_url("js/jquery.tmpl.js"));
 $PAGE->requires->js(new moodle_url("js/handlebars.js"));
 $PAGE->requires->js(new moodle_url("js/ajaxupload.js"));
 $PAGE->requires->js(new moodle_url("js/map.js"));
-$PAGE->requires->js(new moodle_url("js/module.js"));
+// Cache-buster: these files are served by direct URL (no Moodle asset revision),
+// so browsers cache them indefinitely. Tie the URL to the plugin version so a
+// version bump actually forces a re-fetch of the updated JS.
+$statements_jsrev = get_config('mod_statements', 'version');
+$PAGE->requires->js(new moodle_url("js/module.js", array("v" => $statements_jsrev)));
 if (statements_use_api_rendering()) {
     // Problem data is loaded from the API and rendered client-side.
-    $PAGE->requires->js(new moodle_url("js/statement_api.js"));
+    $PAGE->requires->js(new moodle_url("js/statement_api.js", array("v" => $statements_jsrev)));
 }
 
 if (!$without_course)
