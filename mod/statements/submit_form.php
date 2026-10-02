@@ -29,8 +29,10 @@
 								<button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown" id="lang_id" value="3">
 									FreePascal
 								</button>
-								<div class="dropdown-menu" aria-labelledby="lang_id">';
-                                if (!$chapter->output_only) {
+								<div class="dropdown-menu statement-api-languages" aria-labelledby="lang_id" data-problem-id="'.intval($chapter->id).'">';
+                                if (statements_use_api_rendering()) {
+                                    // Experimental: the options come from the API (js/statement_api.js).
+                                } else if (!$chapter->output_only) {
 					require("langs.php");
 					$l_array = $lang_array;
 					if ($chapter->id == 112583) {

@@ -186,7 +186,11 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
 		toggle.prop("disabled", true);
 		jQuery.get("/py/problem/" + problem_id + "/limits/" + limit_action)
 			.done(function() {
-				window.StatementApi.refreshLimits(problem_id, show);
+				// statement_api.js (API-rendering mode) exposes refreshLimits;
+				// guard against a stale/missing asset so we never hard-crash.
+				if (window.StatementApi && window.StatementApi.refreshLimits) {
+					window.StatementApi.refreshLimits(problem_id, show);
+				}
 			})
 			.always(function() {
 				toggle.prop("disabled", false);
@@ -1063,7 +1067,8 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
         if (statement_mode == 'submit' || statement_mode == 'statement') {
             initPagination(); 
         }
-    jQuery('a[class*="lang_choose_option"]').bind("click", 
+    // delegated: with API rendering the options are added after page load
+    jQuery(document).on("click", "a.lang_choose_option",
     	function() {
 			jQuery('#lang_id').dropdown('hide');
 			jQuery('#lang_id').html(this.text);
@@ -1082,6 +1087,10 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                 if (course_id) {
                     data["course_id"] = course_id;
                 }
+                var statement_id = jQuery('#statement_id').html();
+                if (statement_id) {
+                    data["statement_id"] = statement_id;
+                }
 		var test = new AjaxUpload(jQuery('#upload_button'), {
 			'action': '/py/problem/'+ problemId +'/submit',
 		        name: 'file',
@@ -1092,7 +1101,11 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
 	                    jQuery('#filename').text(file);
 			    jQuery.each(lang_array, function() {
 				if (this.ext == extension) {
-					jQuery('a[id="lang_choose_option"][value="' + this.id + '"]')[0].click();
+					// the language may be absent from the dropdown (restricted by the problem or statement)
+					var option = jQuery('a[id="lang_choose_option"][value="' + this.id + '"]')[0];
+					if (option) {
+						option.click();
+					}
 				}
 			    });
         		},
