@@ -126,7 +126,6 @@ class Submits {
         global $USER;
 
         $res='<script type="text/javascript" src="/mod/statements/lib/prism/prism.js"></script>
-		      <script src="https://www.google.com/recaptcha/api.js"></script>
               <link type="text/css" href="/mod/statements/lib/prism/prism.css" rel="stylesheet" />';
         $run_master_sid = '';
         if (has_capability('moodle/ejudge_submits:rejudge', context_system::instance())) {
@@ -268,22 +267,6 @@ class Submits {
                 </table>
             </div>
         </script>
-        <script id="submit-archive-tmpl" type="text/x-jquery-tmpl">
-            <h5>Архив для локального запуска</h5> 
-            <form action="/py/protocol/get_submit_archive/${$item.problem_id}/${$item.run_id}" method="POST" target="_blank">
-                <label class="checkbox" id="downlad_sources">
-                    <input type="checkbox" id="downlad_sources_inp" checked="yes" name="sources"> Вложить исходный код.
-                </label>
-                <label class="checkbox" id="download_all_tests">
-                    <input type="checkbox" id="download_all_tests_inp" onchange="toggleDownloadTests()" name="all_tests"> Вложить все тесты.
-                </label>
-                <input id="download_tests_inp" type="text"placeholder="Номера тестов…" value="{{if $item.stat.first_failed_test !== "&mdash;"}}${$item.stat.first_failed_test}{{/if}}" name="tests">
-				<div id="recaptcha_element"></div>
-                <span class="help-block">Номера тестов для скачивания через пробел.</span>
-                <button class="btn">Загрузить</button>
-            </form>
-        </script>
-
         <script id="full-protocol-tmpl" type="text/x-jquery-tmpl">
             {{if $data.message != undefined}}
                 <pre>${message}</pre>;
@@ -293,9 +276,6 @@ class Submits {
                         <div class="row">
                             <div class="span5">
                                 {{tmpl($data, $item) "#statistic-tmpl"}}
-                            </div>
-                            <div class="span4">
-                                {{tmpl($data, $item) "#submit-archive-tmpl"}}
                             </div>
                         </div>
                     </div>

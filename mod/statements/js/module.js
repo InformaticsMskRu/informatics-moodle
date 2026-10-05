@@ -750,9 +750,6 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                                 }
                             );
                             jQuery("#fullProtocolTab"+ run_id).html(res);
-                            grecaptcha.render("recaptcha_element", {
-                                "sitekey" : "6Lee4wETAAAAAC4PYfOc2t74KBTBuMvW-HFswHxK"
-                            });
                         }
                     });                   
                 }
@@ -801,15 +798,6 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                 });
 
             }
-            function toggleDownloadTests() {
-                if ($("#download_all_tests_inp")[0].checked) {
-                    $("#download_tests_inp")[0].disabled = true;
-                }
-                else {
-                    $("#download_tests_inp")[0].disabled = false;   
-                }
-            }
-
             function getSubmitStatistic(data) {
                 tests = data["tests"]
                 stat = {"max_cpu": -1,
