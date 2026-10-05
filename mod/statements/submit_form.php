@@ -15,9 +15,6 @@
 	
 
     $res = '
-        <!--<script type="text/javascript" src="/legacy/ajax/js/uploader/ajaxupload.js"></script>       -->
-        <!--<link type="text/css" href="/moodle/ajax/js/jquery-window-5.01b/css/jquery.window.css" rel="stylesheet" />-->
-        <!--<script type="text/javascript" src="/moodle/ajax/js/jquery-window-5.01b/jquery.window.min.js"></script>-->
                         <div style="display:none; float: left">
                             <input id="resetFocus" name="resetFocus"/>
                         </div>
