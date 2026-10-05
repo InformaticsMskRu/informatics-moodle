@@ -210,10 +210,8 @@ $PAGE->requires->js(new moodle_url("js/map.js"));
 // version bump actually forces a re-fetch of the updated JS.
 $statements_jsrev = get_config('mod_statements', 'version');
 $PAGE->requires->js(new moodle_url("js/module.js", array("v" => $statements_jsrev)));
-if (statements_use_api_rendering()) {
-    // Problem data is loaded from the API and rendered client-side.
-    $PAGE->requires->js(new moodle_url("js/statement_api.js", array("v" => $statements_jsrev)));
-}
+// Problem data is loaded from the API and rendered client-side.
+$PAGE->requires->js(new moodle_url("js/statement_api.js", array("v" => $statements_jsrev)));
 
 if (!$without_course)
 {
@@ -544,14 +542,9 @@ if ($show_statements) {
     $content .='<link type="text/css" href="/mod/statements/lib/prism/prism.css" rel="stylesheet" />';
 #	<script>jQuery.post("/py/ideal/get_by_problem_html?problem_id=' . $chapterid . '" , {}, function(result) {jQuery("#ideal-solutions").html(result);prettyPrint();});</script>';
 #    $content .='<script>jQuery.get("/py/hint/get_by_problem_html?problem_id=' . $chapterid . '" , function(result) {jQuery("#hint-list").html(result);prettyPrint();});</script>';
-	if (statements_use_api_rendering()) {
-		// Statement and sample tests are loaded from the API and
-		// rendered client-side (js/statement_api.js).
-		$content .= "<div class='statement-api-content' data-problem-id='" . intval($problem_id) . "'></div>";
-	} else {
-		$content .= $chapter->content;
-		$content .= $chapter->sample_tests_html;
-	}
+	// Statement and sample tests are loaded from the API and
+	// rendered client-side (js/statement_api.js).
+	$content .= "<div class='statement-api-content' data-problem-id='" . intval($problem_id) . "'></div>";
     if (has_capability('moodle/site:edit_problem', context_system::instance())) {
 	    $content .= "<div id='problem_panel' class='bootstrap'> 
     	<button type='button' id='problem_tests_load' class='btn btn-light'>Показать тесты</button> 

@@ -44,20 +44,10 @@ function statement_add_limits($chapter) {
     }
 
     if (has_capability('moodle/site:edit_problem', context_system::instance()) && isset($chapter)) {
-        if (statements_use_api_rendering()) {
-            // The service block (ejudge links) is loaded from the API
-            // and rendered client-side (js/statement_api.js).
-            $bc->content = "<div class='statement-api-service' data-problem-id='" . intval($chapter->id) . "'></div>";
-            // The toggle updates the limits block in place via the API, so it is
-            // only offered in API-rendering mode.
-            $bc->content .= statement_limits_toggle($chapter);
-        } else {
-            $query='SELECT 1,ejudge_id,mdl_ejudge_contest.name as n,mdl_ejudge_problem.short_id as letter from mdl_problems, mdl_ejudge_contest, mdl_ejudge_problem where mdl_problems.pr_id=mdl_ejudge_problem.id AND mdl_ejudge_contest.id=mdl_ejudge_problem.contest_id AND mdl_problems.id='.$chapter->id;
-            $cont=$DB->get_records_sql($query);
-            $string = (int)($cont[1]->ejudge_id).'/'.$cont[1]->letter;
-            $url = new moodle_url("/cgi-bin/new-master", array("contest_id"=>$cont[1]->ejudge_id));
-            $bc->content = $cont[1]->n." <a href='".$url."'>".$string."</a>";
-        }
+        // The service block (ejudge links) is loaded from the API
+        // and rendered client-side (js/statement_api.js).
+        $bc->content = "<div class='statement-api-service' data-problem-id='" . intval($chapter->id) . "'></div>";
+        $bc->content .= statement_limits_toggle($chapter);
         $PAGE->blocks->add_fake_block($bc, $PAGE->blocks->get_default_region());
     }
 }
