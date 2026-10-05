@@ -540,7 +540,6 @@ if ($show_statements) {
         else
 		    $content .= "<div id='ideal-solutions' style='display:none;'></div>";    
 		$content .= "<div id='hint-list' style='display:none;'></div>";
-	$content .='<script src="https://www.google.com/recaptcha/api.js"></script>';
     $content .='<script type="text/javascript" src="/mod/statements/lib/prism/prism.js"></script>';
     $content .='<link type="text/css" href="/mod/statements/lib/prism/prism.css" rel="stylesheet" />';
 #	<script>jQuery.post("/py/ideal/get_by_problem_html?problem_id=' . $chapterid . '" , {}, function(result) {jQuery("#ideal-solutions").html(result);prettyPrint();});</script>';
