@@ -307,6 +307,9 @@
         setData: function(data){
             this._settings.data = data;
         },
+        setAction: function(action){
+            this._settings.action = action;
+        },
         disable: function(){            
             addClass(this._button, this._settings.disabledClass);
             this._disabled = true;

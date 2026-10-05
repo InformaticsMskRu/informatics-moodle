@@ -228,7 +228,7 @@ if (!$without_course)
         }
 	echo $OUTPUT->header();
         if ($mode != 'submit' && $mode != 'standing') { 
-	    echo format_text($OUTPUT->heading('Задача №'.$chapter->id.". ".$chapter->name, 4), FORMAT_HTML, array("noclean" => true), $course->id);
+	    echo format_text($OUTPUT->heading('Задача №'.$chapter->id.". ".$chapter->name, 4, null, 'statement-problem-heading'), FORMAT_HTML, array("noclean" => true), $course->id);
         }
 	if ($statements->summary) {
 		 $statements->intro = $statements->summary;
