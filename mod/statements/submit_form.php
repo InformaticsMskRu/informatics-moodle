@@ -26,30 +26,7 @@
 									FreePascal
 								</button>
 								<div class="dropdown-menu statement-api-languages" aria-labelledby="lang_id" data-problem-id="'.intval($chapter->id).'">';
-                                if (statements_use_api_rendering()) {
-                                    // Experimental: the options come from the API (js/statement_api.js).
-                                } else if (!$chapter->output_only) {
-					require("langs.php");
-					$l_array = $lang_array;
-					if ($chapter->id == 112583) {
-					    $l_array = $lang_ant_1;
-					}
-
-					if ($chapter->id == 112584) {
-					    $l_array = $lang_ant_2;
-					}
-
-
-					foreach ($l_array as $id => $val) {
-						if ($val["priv"] && has_capability('moodle/ejudge_submits:rejudge', context_system::instance())) {
-						$res.= '<a class="dropdown-item lang_choose_option" id="lang_choose_option" value="'.$id.'" href="#">'.$val["name"]."</a>";
-					    } else if ($val["unpriv"]) {
-						$res.= '<a class="dropdown-item lang_choose_option" id="lang_choose_option" value="'.$id.'" href="#">'.$val["name"]."</a>";					
-					}}
-
-                                } else {
-						$res.= '<a class="dropdown-item lang_choose_option" id="lang_choose_option" value="0" href="#">Текстовый файл</a>';					
-                        }
+					// The language options are loaded from the API (js/statement_api.js).
 					$res .= '</div>
 						</div>
 						<button id="submit_button" class="btn btn-primary">Отправить <span class="badge badge-light" id="filename"></span></button>
