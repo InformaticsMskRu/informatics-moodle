@@ -4,7 +4,9 @@
 // .statement-api-limits (limits), .statement-api-service (ejudge links) and
 // .statement-api-languages (the submit form's language dropdown); the
 // problem id is taken from the problem-id data attribute. Each problem is fetched
-// once even when several containers reference it.
+// once even when several containers reference it. Picking another problem in the
+// table of contents swaps all of this in place (see switchTo()) instead of
+// reloading the page.
 (function() {
     function escapeHtml(value) {
         return String(value)
@@ -67,7 +69,8 @@
 
     // Mirrors limit_block() in limits.php: timelimit floored to 2 decimals in
     // seconds, memorylimit in MiB; timelimit is shown only when positive.
-    // Rendering is skipped (and the block hidden) when show_limits is off.
+    // Rendering is skipped (and the block hidden) when show_limits is off or the
+    // problem has no limits.
     function renderLimits(container, data) {
         var show = container.getAttribute('data-show-limits') !== '0';
         if (!show) {
@@ -85,7 +88,7 @@
             html += '<i class="icon fa fa-table fa-fw" aria-hidden="true"></i>' + mib + ' MiB<br/>';
         }
         container.innerHTML = html;
-        setLimitsBlockHidden(container, false);
+        setLimitsBlockHidden(container, html === '');
     }
 
     // Re-fetches the problem and re-renders its limits without a page reload.
@@ -168,40 +171,69 @@
         }
     }
 
-    function render(problemId, group) {
+    function problemUrl(problemId, withLanguages) {
         var url = '/py/problem/' + encodeURIComponent(problemId) + '/json';
         // the statement's allowed_languages narrows the languages
         var statementNode = document.getElementById('statement_id');
         var statementId = statementNode ? parseInt(statementNode.textContent, 10) : NaN;
-        if (group.languages.length && statementId > 0) {
+        if (withLanguages && statementId > 0) {
             url += '?statement_id=' + statementId;
         }
-        fetch(url, {credentials: 'same-origin'})
+        return url;
+    }
+
+    function fetchProblem(problemId, withLanguages, signal) {
+        var options = {credentials: 'same-origin'};
+        if (signal) {
+            options.signal = signal;
+        }
+        return fetch(problemUrl(problemId, withLanguages), options)
             .then(function(response) {
-                return response.json();
-            })
+                return response.json().then(function(data) {
+                    if (!response.ok || !data || data.error) {
+                        throw new Error('Problem ' + problemId + ' was not loaded: ' + response.status);
+                    }
+                    return data;
+                });
+            });
+    }
+
+    function renderGroup(group, data) {
+        group.statement.forEach(function(container) {
+            renderStatement(container, data);
+        });
+        group.limits.forEach(function(container) {
+            renderLimits(container, data);
+        });
+        group.service.forEach(function(container) {
+            renderService(container, data);
+        });
+        group.languages.forEach(function(container) {
+            renderLanguages(container, data);
+        });
+    }
+
+    function render(problemId, group) {
+        fetchProblem(problemId, group.languages.length > 0)
             .then(function(data) {
-                if (!data) {
-                    return;
-                }
-                group.statement.forEach(function(container) {
-                    renderStatement(container, data);
-                });
-                group.limits.forEach(function(container) {
-                    renderLimits(container, data);
-                });
-                group.service.forEach(function(container) {
-                    renderService(container, data);
-                });
-                group.languages.forEach(function(container) {
-                    renderLanguages(container, data);
-                });
+                renderGroup(group, data);
             })
             .catch(function(error) {
                 if (window.console) {
                     console.error('Failed to load the problem from the API', error);
                 }
             });
+    }
+
+    var GROUP_SELECTORS = {
+        statement: '.statement-api-content',
+        limits: '.statement-api-limits',
+        service: '.statement-api-service',
+        languages: '.statement-api-languages'
+    };
+
+    function findContainers(key) {
+        return Array.prototype.slice.call(document.querySelectorAll(GROUP_SELECTORS[key]));
     }
 
     function init() {
@@ -220,23 +252,171 @@
                 groups[problemId][key].push(nodes[i]);
             }
         }
-        collect('.statement-api-content', 'statement');
-        collect('.statement-api-limits', 'limits');
-        collect('.statement-api-service', 'service');
-        collect('.statement-api-languages', 'languages');
+        Object.keys(GROUP_SELECTORS).forEach(function(key) {
+            collect(GROUP_SELECTORS[key], key);
+        });
 
         Object.keys(groups).forEach(function(problemId) {
             render(problemId, groups[problemId]);
         });
     }
 
+    // ---- Switching the problem without a page reload ----------------------
+
+    var pending = null;
+
+    function currentProblemId() {
+        var node = document.querySelector('.statement-api-content');
+        return node ? node.getAttribute('data-problem-id') : null;
+    }
+
+    // The table of contents: highlight the item of the opened problem.
+    function updateToc(problemId) {
+        var links = document.querySelectorAll('.statements_toc a.statements-toc-link');
+        for (var i = 0; i < links.length; i++) {
+            var current = links[i].getAttribute('data-chapterid') === String(problemId);
+            links[i].classList.toggle('statements-toc-current', current);
+            if (current) {
+                links[i].setAttribute('aria-current', 'page');
+            } else {
+                links[i].removeAttribute('aria-current');
+            }
+        }
+    }
+
+    // Everything outside the API containers that PHP renders per problem.
+    function updateChrome(problemId, data) {
+        var heading = document.getElementById('statement-problem-heading');
+        if (heading) {
+            heading.textContent = 'Задача №' + problemId + '. ' + data.name;
+        }
+        var submits = document.getElementById('statements-problem-submits-link');
+        if (submits) {
+            submits.setAttribute('href', 'view.php?chapterid=' + encodeURIComponent(problemId) + '&submit');
+        }
+        var toggle = document.getElementById('invert_limits');
+        if (toggle) {
+            toggle.setAttribute('data-problem-id', problemId);
+            toggle.checked = !!data.show_limits;
+        }
+        // Admin tools (js/module.js) read the problem from this element on click.
+        var problemData = document.getElementById('problem_data');
+        if (problemData) {
+            problemData.setAttribute('problem_id', problemId);
+            problemData.setAttribute('sample_tests', data.sample_tests || '');
+            problemData.setAttribute('limit_action', 'show_limits' in data ? (data.show_limits ? 'hide' : 'show') : 'null');
+        }
+        ['problem_tests', 'myAlert'].forEach(function(id) {
+            var node = document.getElementById(id);
+            if (node) {
+                node.innerHTML = '';
+            }
+        });
+    }
+
+    function applyProblem(problemId, data) {
+        var group = {};
+        Object.keys(GROUP_SELECTORS).forEach(function(key) {
+            group[key] = findContainers(key);
+            group[key].forEach(function(container) {
+                container.setAttribute('data-problem-id', problemId);
+            });
+        });
+        // Admins get show_limits explicitly; for others the API sends the limits
+        // only when they are shown.
+        var showLimits = 'show_limits' in data ? !!data.show_limits : 'memorylimit' in data;
+        group.limits.forEach(function(container) {
+            container.setAttribute('data-show-limits', showLimits ? '1' : '0');
+        });
+        renderGroup(group, data);
+        updateToc(problemId);
+        updateChrome(problemId, data);
+        // js/module.js retargets the submit form and reloads the submits table.
+        document.dispatchEvent(new CustomEvent('statements:problemchange', {detail: {problemId: problemId, data: data}}));
+    }
+
+    // Opens the problem in place. url is the address of the problem's page: it
+    // goes to the history and is the fallback for a regular navigation if the
+    // API call fails. Returns false when the page can't switch in place.
+    function switchTo(problemId, url, push) {
+        var content = document.querySelector('.statement-api-content');
+        if (!content || typeof fetch !== 'function') {
+            return false;
+        }
+        if (String(problemId) === currentProblemId()) {
+            return true;
+        }
+        if (pending) {
+            pending.abort();
+        }
+        var controller = typeof AbortController === 'function' ? new AbortController() : null;
+        pending = controller || {abort: function() {}};
+        var request = pending;
+        content.classList.add('statement-api-loading');
+
+        fetchProblem(problemId, findContainers('languages').length > 0, controller && controller.signal)
+            .then(function(data) {
+                if (pending !== request) {
+                    return;
+                }
+                pending = null;
+                content.classList.remove('statement-api-loading');
+                if (push) {
+                    history.pushState({problemId: problemId}, '', url + '#1');
+                }
+                applyProblem(problemId, data);
+                window.scrollTo(0, 0);
+            })
+            .catch(function(error) {
+                if (error && error.name === 'AbortError') {
+                    return;
+                }
+                if (window.console) {
+                    console.error('Failed to switch the problem, reloading the page', error);
+                }
+                window.location.href = url;
+            });
+        return true;
+    }
+
+    function initSwitching() {
+        if (!document.querySelector('.statement-api-content') || !window.history || !history.pushState) {
+            return;
+        }
+        history.replaceState({problemId: currentProblemId()}, '');
+
+        document.addEventListener('click', function(event) {
+            var link = event.target.closest ? event.target.closest('.statements_toc a.statements-toc-link') : null;
+            if (!link || event.defaultPrevented || event.button !== 0 ||
+                    event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+                return;
+            }
+            if (switchTo(link.getAttribute('data-chapterid'), link.href, true)) {
+                event.preventDefault();
+            }
+        });
+
+        window.addEventListener('popstate', function() {
+            var match = /[?&]chapterid=(\d+)/.exec(window.location.search);
+            if (match) {
+                switchTo(match[1], window.location.href, false);
+            }
+        });
+    }
+
     // Lets js/module.js refresh the limits block after the toggle flips the flag.
     window.StatementApi = window.StatementApi || {};
     window.StatementApi.refreshLimits = refreshLimits;
+    window.StatementApi.switchTo = switchTo;
+
+    function start() {
+        init();
+        initSwitching();
+    }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', start);
     } else {
-        init();
+        start();
     }
 })();

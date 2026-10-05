@@ -229,6 +229,20 @@
     display: none;
 }
 
+/* The current problem in the table of contents; it is a link so the item can
+   change without a page reload. */
+.statements_toc a.statements-toc-current {
+    color: inherit;
+    cursor: default;
+    font-weight: bold;
+}
+
+/* Statement being replaced after another problem was picked in the table of
+   contents. */
+.statement-api-loading {
+    opacity: 0.5;
+}
+
 /* "Показать/спрятать лимиты" switch in the "Служебное" sidebar block */
 .moodle-toggle {
     display: flex;

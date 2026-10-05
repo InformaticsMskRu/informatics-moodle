@@ -13,7 +13,7 @@ defined('MOODLE_INTERNAL') or die('Direct access to this script is forbidden.');
 
 // Renders the "Показать/спрятать лимиты" control as a switch. The checked state
 // mirrors $chapter->show_limits; the data attributes drive the API call in
-// js/module.js, which reloads the page after flipping the flag.
+// js/module.js, which refreshes the limits block after flipping the flag.
 function statement_limits_toggle($chapter) {
     $checked = !empty($chapter->show_limits) ? ' checked' : '';
     return "<label class='moodle-toggle' title='Show limits'>"
@@ -34,14 +34,12 @@ function statement_add_limits($chapter) {
     $bc_limit->title = 'Ограничения';
     $bc_limit->attributes['class'] = 'block block_statements_menu';
     $bc_limit->content = limit_block($chapter);
-    if (strlen($bc_limit->content) > 0) {
-        // limit_block() emits the container for admins even when limits are
-        // hidden; keep the block itself hidden until the toggle shows it.
-        if (empty($chapter->show_limits)) {
-            $bc_limit->attributes['class'] .= ' statements-limits-block-hidden';
-        }
-        $PAGE->blocks->add_fake_block($bc_limit, $PAGE->blocks->get_default_region());
+    // Keep the block hidden until there are limits to show; js/statement_api.js
+    // toggles it when the limits are refreshed.
+    if (empty($chapter->show_limits) || !$chapter->memorylimit) {
+        $bc_limit->attributes['class'] .= ' statements-limits-block-hidden';
     }
+    $PAGE->blocks->add_fake_block($bc_limit, $PAGE->blocks->get_default_region());
 
     if (has_capability('moodle/site:edit_problem', context_system::instance()) && isset($chapter)) {
         // The service block (ejudge links) is loaded from the API
@@ -58,7 +56,7 @@ function statements_add_menu_block($chapter, $cmid=0) {
     $content = "";
     if ($cmid) {
         if ($mode == 'statement') {
-             $content .= "<div> <a href='view.php?chapterid=".$chapter->id."&submit'>Посылки по задаче</a></div>";
+             $content .= "<div> <a id='statements-problem-submits-link' href='view.php?chapterid=".$chapter->id."&submit'>Посылки по задаче</a></div>";
         }
         $content .= "<div> <a href='view.php?id=".$cmid."&submit'>Все посылки</a></div>";
         $content .= "<div> <a href='view.php?id=".$cmid."&standing'>Результаты</a></div>"; 
@@ -158,13 +156,15 @@ function statements_get_toc($chapters, $chapter, $book, $cm, $edit) {
             $titleout = html_writer::tag('span', $title, array('class' => 'dimmed_text'));
 		}
 
+		// Every item is a link so that js/statement_api.js can switch the current
+		// problem without a reload.
+		$link_attrs = array('title' => $titleunescaped, 'class' => 'text-truncate statements-toc-link',
+			'data-chapterid' => $ch->id);
 		if ($ch->id == $chapter->id) {
-			$toc .= html_writer::tag('strong', $titleout, array('class' => 'text-truncate'));
-		} else {
-			$toc .= html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'chapterid' => $ch->id)), $titleout,
-				array('title' => $titleunescaped, 'class' => 'text-truncate')
-		 	);
+			$link_attrs['class'] .= ' statements-toc-current';
+			$link_attrs['aria-current'] = 'page';
 		}
+		$toc .= html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'chapterid' => $ch->id)), $titleout, $link_attrs);
 		if (has_capability('moodle/site:edit_problem', context_system::instance())) {
 			$toc .= html_writer::link(
 				new moodle_url('edit.php', array('cmid' => $cm->id, 'chapterid' =>  $ch->id)),

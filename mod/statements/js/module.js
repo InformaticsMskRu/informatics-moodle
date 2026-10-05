@@ -491,6 +491,7 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
                                 reload_text: 'Обновить'
                             });
 						 jQuery("#ArchiveButton")
+                         .off("click")
                          .bind("click", function (e) {
                                 e.preventDefault();
                                 window.location.href = '/ajax/ajax.php?problem_id='+problemId+'&'
@@ -1055,6 +1056,15 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
         if (statement_mode == 'submit' || statement_mode == 'statement') {
             initPagination(); 
         }
+        // Another problem was opened in place (js/statement_api.js): reload the
+        // submits table for it.
+        jQuery(document).on('statements:problemchange', function(e) {
+            jQuery('#problem_id').text(e.originalEvent.detail.problemId);
+            window.CACHED_RUNS = undefined;
+            if (jQuery('#Pagination').length) {
+                initPagination();
+            }
+        });
     // delegated: with API rendering the options are added after page load
     jQuery(document).on("click", "a.lang_choose_option",
     	function() {
@@ -1109,6 +1119,10 @@ require(['jquery', 'jqueryui', 'tmpl', 'handlebars'], function(jQuery) {
         	            }
                         }
 	          });
+                // Another problem was opened in place (js/statement_api.js): submit to it.
+                jQuery(document).on('statements:problemchange', function(e) {
+                    test.setAction('/py/problem/' + e.originalEvent.detail.problemId + '/submit');
+                });
         }     
 });
 
